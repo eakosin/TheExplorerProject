@@ -1,6 +1,6 @@
 require("helpers")
 
-nonLinearCave = {}
+local nonLinearCave = {}
 
 nonLinearCave.searchDistance = 2
 nonLinearCave.shortCircuit = 0
@@ -190,3 +190,5 @@ function nonLinearCave.generate(map, seed, decay)
 	nonLinearCave.newTile(map,math.random((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return
 end
+
+return nonLinearCave

@@ -10,14 +10,13 @@ activeKeys = {}
 
 --Special settings for development
 devConf = {}
-devConf.seed = 2
+devConf.seed = 7
 devConf.decay = 400
-devConf.mapType = "linearCave"
+devConf.mapType = "nonLinearTunnel"
 devConf.tileImage = nil
 
 function love.keypressed(key)
 	activeKeys[key] = true
-	print(key)
 end
 
 function love.keyreleased(key)
@@ -36,24 +35,26 @@ function love.update(dt)
 		love.event.quit()
 	end
 	if(activeKeys.up) then
-		camera:move(0,4)
+		camera.move(0,4)
 	end
 	if(activeKeys.down) then
-		camera:move(0,-4)
+		camera.move(0,-4)
 	end
 	if(activeKeys.left) then
-		camera:move(4,0)
+		camera.move(4,0)
 	end
 	if(activeKeys.right) then
-		camera:move(-4,0)
+		camera.move(-4,0)
 	end
 	world.processEventQueue()
-	print("dx: "..camera:dx(),"dy: "..camera:dy(),"x: "..camera.x,"y: "..camera.y)
+	if(camera.dx() ~= 0 or camera.dy() ~= 0) then
+		print("dx: "..camera.dx(),"dy: "..camera.dy(),"x: "..camera.x,"y: "..camera.y)
+	end
 end
 
 --Draw scene
 function love.draw()
-	love.graphics.translate(camera:getPosition())
+	love.graphics.translate(camera.getPosition())
 	world.draw()
 end
 

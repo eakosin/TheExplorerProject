@@ -1,6 +1,6 @@
 require("helpers")
 
-nonLinearTunnel = {}
+local nonLinearTunnel = {}
 
 nonLinearTunnel.searchDistance = 5
 nonLinearTunnel.shortCircuit = 0
@@ -299,3 +299,5 @@ function nonLinearTunnel.generate(map, seed, decay)
 	nonLinearTunnel.newTile(map,math.random((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return
 end
+
+return nonLinearTunnel

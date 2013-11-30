@@ -1,8 +1,8 @@
 require("helpers")
 
-linearTunnel = {}
+local linearTunnel = {}
 
-linearTunnel.searchDistance = 3
+linearTunnel.searchDistance = 5
 linearTunnel.shortCircuit = 0
 linearTunnel.closeFunc = false
 linearTunnel.searchShape = "diamond"
@@ -285,3 +285,5 @@ function linearTunnel.generate(map, seed, decay)
 	linearTunnel.newTile(map,math.random((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return
 end
+
+return linearTunnel

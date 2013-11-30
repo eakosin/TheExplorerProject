@@ -1,6 +1,6 @@
 require("helpers")
 
-linearCave = {}
+local linearCave = {}
 
 linearCave.searchDistance = 20
 linearCave.shortCircuit = 0
@@ -177,3 +177,5 @@ function linearCave.generate(map, seed, decay)
 	linearCave.newTile(map,math.random((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return
 end
+
+return linearCave

@@ -27,7 +27,6 @@ function level:buildQuads()
 	self.quads = {}
 	self.numTilesX = helpers.int(self.image:getWidth()/self.tsx)
 	self.numTilesY = helpers.int(self.image:getHeight()/self.tsy)
-	print(self.numTilesX, self.numTilesY)
 	for tx = 1,self.numTilesX do
 		self.quads[tx] = love.graphics.newQuad(((tx-1)*self.tsx),0,self.tsx,self.tsy,self.image:getWidth(),self.image:getHeight())
 	end

@@ -2,10 +2,10 @@ require("map/mapTypes")
 
 mapGeneration = {}
 
-require("map/generation/base/linearTunnel")
-require("map/generation/base/nonLinearTunnel")
-require("map/generation/base/linearCave")
-require("map/generation/base/nonLinearCave")
+mapGeneration['linearTunnel'] = require("map/generation/base/linearTunnel")
+mapGeneration['nonLinearTunnel'] = require("map/generation/base/nonLinearTunnel")
+mapGeneration['linearCave'] = require("map/generation/base/linearCave")
+mapGeneration['nonLinearCave'] = require("map/generation/base/nonLinearCave")
 
 function mapGeneration.testGeneration()
 	local map1 = map:new()
@@ -20,5 +20,5 @@ function mapGeneration.testGeneration()
 end
 
 function mapGeneration.manualGeneration(script,map,seed,decay)
-	linearCave.generate(map,seed,decay)
+	mapGeneration[script].generate(map,seed,decay)
 end

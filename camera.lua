@@ -6,20 +6,26 @@ camera.y = 0
 camera.lx = 0
 camera.ly = 0
 
-function camera:move(x,y)
-	self.x = self.x + x
-	self.y = self.y + y
+function camera.bound(value,lower,upper)
+	return (value > upper and upper) or (value < lower and lower) or value
 end
 
-function camera:dx()
+function camera.move(x,y)
+	camera.x = camera.x + x
+	camera.x = camera.bound(camera.x,-((60*32)-800),0)
+	camera.y = camera.y + y
+	camera.y = camera.bound(camera.y,-((60*32)-600),0)
+end
+
+function camera.dx()
 	return camera.x - camera.lx
 end
 
-function camera:dy()
+function camera.dy()
 	return camera.y - camera.ly
 end
 
-function camera:getPosition()
-	self.lx, self.ly = self.x, self.y
-	return self.x, self.y
+function camera.getPosition()
+	camera.lx, camera.ly = camera.x, camera.y
+	return camera.x, camera.y
 end
