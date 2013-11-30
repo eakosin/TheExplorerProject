@@ -68,4 +68,3 @@ function helpers.even(value,up)
 		return helpers.odd((value + ((up and sign) or 0)), true) - sign
 	end
 end
-		

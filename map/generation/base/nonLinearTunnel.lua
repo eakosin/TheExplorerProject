@@ -2,11 +2,11 @@ require("helpers")
 
 nonLinearTunnel = {}
 
-nonLinearTunnel.searchDistance = 3
+nonLinearTunnel.searchDistance = 5
 nonLinearTunnel.shortCircuit = 0
 nonLinearTunnel.terminationWeight = 90
 nonLinearTunnel.quickTerminate = false
-nonLinearTunnel.searchShape = "column"
+nonLinearTunnel.searchShape = "diamond"
 nonLinearTunnel.secondTest = true
 
 nonLinearTunnel.pathingWeights = {primary = 50, secondary = 25}

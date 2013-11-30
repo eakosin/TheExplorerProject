@@ -2,7 +2,7 @@ require("helpers")
 
 nonLinearCave = {}
 
-nonLinearCave.searchDistance = 4
+nonLinearCave.searchDistance = 2
 nonLinearCave.shortCircuit = 0
 nonLinearCave.secondTest = false
 

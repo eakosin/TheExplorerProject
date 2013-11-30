@@ -5,7 +5,7 @@ linearTunnel = {}
 linearTunnel.searchDistance = 3
 linearTunnel.shortCircuit = 0
 linearTunnel.closeFunc = false
-linearTunnel.searchShape = "square"
+linearTunnel.searchShape = "diamond"
 
 linearTunnel.pathingWeights = {primary = 50, secondary = 25}
 linearTunnel.directionWeight = {north = 100, west = 75, east = 75, south = 50}

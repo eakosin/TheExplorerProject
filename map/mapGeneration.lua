@@ -1,15 +1,24 @@
 require("map/mapTypes")
+
+mapGeneration = {}
+
 require("map/generation/base/linearTunnel")
 require("map/generation/base/nonLinearTunnel")
 require("map/generation/base/linearCave")
 require("map/generation/base/nonLinearCave")
 
-map1 = map:new()
-map1:buildMap(60,60)
-io.output("./mapoutput.grid", "w")
+function mapGeneration.testGeneration()
+	local map1 = map:new()
+	map1:buildMap(60,60)
+	io.output("./mapoutput.grid", "w")
 
-linearCave.generate(map1,103,200)
+	linearCave.generate(map1,2,400)
 
-map1:printMap(" ")
+	map1:printMap(" ")
 
-io.close()
+	io.close()
+end
+
+function mapGeneration.manualGeneration(script,map,seed,decay)
+	linearCave.generate(map,seed,decay)
+end
