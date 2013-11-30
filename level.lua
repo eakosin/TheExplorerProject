@@ -4,22 +4,33 @@ require("map/mapGeneration")
 
 level = {}
 
-function level:newLevel(script,width,height,seed,decay)
-	level = {}
+function level:newLevel(level)
+	level = level or {}
 	setmetatable(level, self)
 	self.__index = self
-	self.image = love.graphics.newImage("images/craptileset.png")
-	self.map = map:new()
-	self.map:buildMap(width,height)
-	mapGeneration.manualGeneration(script,self.map,seed,decay)
-	io.output("./mapoutput.grid", "w")
-	self.map:printMap(" ")
-	io.close()
 	return self
 end
 
+
+
+function level:buildMap(script,width,height,seed,decay)
+	self.image = love.graphics.newImage("images/craptileset.png")
+	self.map = map:new()
+	self.map:buildMap(width,height)
+	--Compute Timer
+	local timerVal, timerVal2
+	timerVal = love.timer.getTime()
+	mapGeneration.runGenerate(script,self.map,seed,decay)
+	mapGeneration.runScript("outlineWall",self.map)
+	timerVal2 = love.timer.getTime()
+	print(timerVal2 - timerVal)
+	io.output("./mapoutput.grid", "w")
+	self.map:printMap(" ")
+	io.close()
+end
+
 function level:buildSpriteBatch(tsx,tsy)
-	self.spriteBatch = love.graphics.newSpriteBatch(self.image,10000)
+	self.spriteBatch = love.graphics.newSpriteBatch(self.image,1000000)
 	self.tsx, self.tsy = tsx,tsy
 end
 
@@ -33,8 +44,8 @@ function level:buildQuads()
 end
 
 function level:populateSpriteBatch()
-	for y=1,self.map.height do
-		for x=1,self.map.width do
+	for x=1,self.map.width do
+		for y=1,self.map.height do
 			self.spriteBatch:add(self.quads[tonumber(self.map.grid[x][y])],((x-1)*self.tsx),((y-1)*self.tsy))
 		end
 	end

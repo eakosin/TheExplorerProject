@@ -2,7 +2,7 @@ require("helpers")
 
 local nonLinearTunnel = {}
 
-nonLinearTunnel.searchDistance = 5
+nonLinearTunnel.searchDistance = 9
 nonLinearTunnel.shortCircuit = 0
 nonLinearTunnel.terminationWeight = 90
 nonLinearTunnel.quickTerminate = false
@@ -199,7 +199,7 @@ function nonLinearTunnel.newTile(map, x, y, direction, decay)
 	--print("nonLinearTunnel.newTile("..x..","..y..","..direction..","..decay..")")
 	map.grid[x][y] = map.tileset.floor
 	if(decay < math.random(0,100)) then
-		print("DECAYED")
+		--print("DECAYED")
 		return
 	end
 	if(direction == "north") then

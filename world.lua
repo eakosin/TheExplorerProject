@@ -15,7 +15,8 @@ world.eventQueue = {}
 function world.processEventQueue()
 	for key,value in pairs(world.eventQueue) do
 		if(key == "generate" and value) then
-			world.levels.test = level:newLevel(unpack(value))
+			world.levels.test = level:newLevel()
+			world.levels.test:buildMap(unpack(value))
 			world.levels.test:buildSpriteBatch(32,32)
 			world.levels.test:buildQuads()
 			world.levels.test:populateSpriteBatch()

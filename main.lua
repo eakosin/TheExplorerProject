@@ -10,10 +10,13 @@ activeKeys = {}
 
 --Special settings for development
 devConf = {}
-devConf.seed = 7
+devConf.seed = 95
 devConf.decay = 400
 devConf.mapType = "nonLinearTunnel"
 devConf.tileImage = nil
+devConf.mapSize = {x = 60,y = 60}
+devConf.tileSize = {x = 32,y = 32}
+devConf.cameraSpeed = 8
 
 function love.keypressed(key)
 	activeKeys[key] = true
@@ -24,7 +27,9 @@ function love.keyreleased(key)
 end
 
 function love.load()
-	world.eventQueue["generate"] = {devConf.mapType,60,60,devConf.seed,devConf.decay}
+	world.eventQueue["generate"] = {devConf.mapType,devConf.mapSize.x,devConf.mapSize.y,devConf.seed,devConf.decay}
+	camera.tileBound.x, camera.tileBound.y = devConf.mapSize.x, devConf.mapSize.y
+	camera.tileSize.x, camera.tileSize.y = devConf.tileSize.x, devConf.tileSize.x
 	devConf.tileImage = love.graphics.newImage("images/craptileset.png")
 end
 
@@ -35,16 +40,16 @@ function love.update(dt)
 		love.event.quit()
 	end
 	if(activeKeys.up) then
-		camera.move(0,4)
+		camera.move(0,devConf.cameraSpeed)
 	end
 	if(activeKeys.down) then
-		camera.move(0,-4)
+		camera.move(0,-devConf.cameraSpeed)
 	end
 	if(activeKeys.left) then
-		camera.move(4,0)
+		camera.move(devConf.cameraSpeed,0)
 	end
 	if(activeKeys.right) then
-		camera.move(-4,0)
+		camera.move(-devConf.cameraSpeed,0)
 	end
 	world.processEventQueue()
 	if(camera.dx() ~= 0 or camera.dy() ~= 0) then

@@ -89,7 +89,7 @@ function linearCave.newTile(map, x, y, direction, decay)
 	--print("linearCave.newTile("..x..","..y..","..direction..","..decay..")")
 	map.grid[x][y] = map.tileset.floor
 	if(decay < math.random(0,100)) then
-		print("DECAYED")
+		--print("DECAYED")
 		return
 	end
 	if(direction == "north") then

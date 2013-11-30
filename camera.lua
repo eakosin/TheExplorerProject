@@ -5,6 +5,8 @@ camera.x = 0
 camera.y = 0
 camera.lx = 0
 camera.ly = 0
+camera.tileBound = {x = 0, y = 0}
+camera.tileSize = {x = 32, y = 32}
 
 function camera.bound(value,lower,upper)
 	return (value > upper and upper) or (value < lower and lower) or value
@@ -12,9 +14,9 @@ end
 
 function camera.move(x,y)
 	camera.x = camera.x + x
-	camera.x = camera.bound(camera.x,-((60*32)-800),0)
+	camera.x = camera.bound(camera.x,-((camera.tileBound.x*camera.tileSize.x)-800),0)
 	camera.y = camera.y + y
-	camera.y = camera.bound(camera.y,-((60*32)-600),0)
+	camera.y = camera.bound(camera.y,-((camera.tileBound.y*camera.tileSize.y)-600),0)
 end
 
 function camera.dx()
