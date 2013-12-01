@@ -41,16 +41,16 @@ function love.update(dt)
 		love.event.quit()
 	end
 	if(activeKeys.up) then
-		camera.move(0,devConf.cameraSpeed)
-	end
-	if(activeKeys.down) then
 		camera.move(0,-devConf.cameraSpeed)
 	end
+	if(activeKeys.down) then
+		camera.move(0,devConf.cameraSpeed)
+	end
 	if(activeKeys.left) then
-		camera.move(devConf.cameraSpeed,0)
+		camera.move(-devConf.cameraSpeed,0)
 	end
 	if(activeKeys.right) then
-		camera.move(-devConf.cameraSpeed,0)
+		camera.move(devConf.cameraSpeed,0)
 	end
 	world.processEventQueue()
 	if(camera.dx() ~= 0 or camera.dy() ~= 0) then
@@ -60,7 +60,7 @@ end
 
 --Draw scene
 function love.draw()
-	love.graphics.translate(camera.getPosition())
+	love.graphics.translate(camera.getNegativePosition())
 	world.draw()
 end
 
