@@ -25,26 +25,13 @@ function helpers.keys(tblin)
 	return keys
 end
 
---TODO: Simplify and performance
 function helpers.round(value)
-	if(value > 0) then
-		return math.floor(value + 0.5)
-	elseif(value < 0) then
-		return math.ceil(value - 0.5)
-	else
-		return 0
-	end
+	return tonumber(string.format("%." .. "f", num))
 end
 
---TODO: Simplify and performance
 function helpers.int(value)
-	if(value > 0) then
-		return math.floor(value)
-	elseif(value < 0) then
-		return math.ceil(value)
-	else
-		return 0
-	end
+	if value >= 0 then return math.floor(value+.5) 
+    else return math.ceil(value-.5) end
 end
 
 --TODO: If possible simplify and performance
