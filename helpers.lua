@@ -25,7 +25,6 @@ function helpers.keys(tblin)
 	return keys
 end
 
---TODO: Simplify and performance
 function helpers.round(value)
 	if(value > 0) then
 		return math.floor(value + 0.5)
@@ -36,7 +35,6 @@ function helpers.round(value)
 	end
 end
 
---TODO: Simplify and performance
 function helpers.int(value)
 	if(value > 0) then
 		return math.floor(value)

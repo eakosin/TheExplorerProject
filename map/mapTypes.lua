@@ -28,10 +28,30 @@ function map:buildMap(inwidth, inheight)
 	end
 end
 
+function map:addMapLayer(name,fillValue)
+	self[name] = {}
+	for x=1,self.width do
+		self[name][x] = {}
+		for y=1,self.height do
+			self[name][x][y] = fillValue
+		end
+	end
+end
+
 function map:printMap(spacer)
 	for y=1,self.height do
 		for x=1,self.width do
 			io.write(self.grid[x][y]..spacer)
+		end
+		io.write("\n")
+	end
+end
+
+function map:printReadableMap(spacer)
+	local conversion = {'.','+','#','~'}
+	for y=1,self.height do
+		for x=1,self.width do
+			io.write(conversion[tonumber(self.grid[x][y])]..spacer)
 		end
 		io.write("\n")
 	end

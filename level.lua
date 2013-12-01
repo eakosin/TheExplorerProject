@@ -11,8 +11,6 @@ function level:newLevel(level)
 	return self
 end
 
-
-
 function level:buildMap(script,width,height,seed,decay)
 	self.image = love.graphics.newImage("images/craptileset.png")
 	self.map = map:new()
@@ -25,9 +23,10 @@ function level:buildMap(script,width,height,seed,decay)
 	timerVal2 = love.timer.getTime()
 	print(timerVal2 - timerVal)
 	io.output("./mapoutput.grid", "w")
-	self.map:printMap(" ")
+	self.map:printReadableMap(" ")
 	io.close()
 end
+
 
 function level:buildSpriteBatch(tsx,tsy)
 	self.spriteBatch = love.graphics.newSpriteBatch(self.image,1000000)
@@ -39,14 +38,17 @@ function level:buildQuads()
 	self.numTilesX = helpers.int(self.image:getWidth()/self.tsx)
 	self.numTilesY = helpers.int(self.image:getHeight()/self.tsy)
 	for tx = 1,self.numTilesX do
-		self.quads[tx] = love.graphics.newQuad(((tx-1)*self.tsx),0,self.tsx,self.tsy,self.image:getWidth(),self.image:getHeight())
+		for ty = 1,self.numTilesY do
+			self.quads[tx+((ty-1)*self.numTilesX)] = love.graphics.newQuad(((tx-1)*self.tsx),((ty-1)*self.tsy),self.tsx,self.tsy,self.image:getWidth(),self.image:getHeight())
+		end
 	end
 end
 
 function level:populateSpriteBatch()
+	self.map:addMapLayer("spriteBatchID",0)
 	for x=1,self.map.width do
 		for y=1,self.map.height do
-			self.spriteBatch:add(self.quads[tonumber(self.map.grid[x][y])],((x-1)*self.tsx),((y-1)*self.tsy))
+			self.map.spriteBatchID[x][y] = self.spriteBatch:add(self.quads[tonumber(self.map.grid[x][y])],((x-1)*self.tsx),((y-1)*self.tsy))
 		end
 	end
 end

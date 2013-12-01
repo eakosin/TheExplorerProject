@@ -11,6 +11,7 @@ activeKeys = {}
 --Special settings for development
 devConf = {}
 devConf.seed = 95
+--Max of 16375 - Stack Size
 devConf.decay = 400
 devConf.mapType = "nonLinearTunnel"
 devConf.tileImage = nil
@@ -27,7 +28,7 @@ function love.keyreleased(key)
 end
 
 function love.load()
-	world.eventQueue["generate"] = {devConf.mapType,devConf.mapSize.x,devConf.mapSize.y,devConf.seed,devConf.decay}
+	world.eventQueue.level["generate"] = {devConf.mapType,devConf.mapSize.x,devConf.mapSize.y,devConf.seed,devConf.decay}
 	camera.tileBound.x, camera.tileBound.y = devConf.mapSize.x, devConf.mapSize.y
 	camera.tileSize.x, camera.tileSize.y = devConf.tileSize.x, devConf.tileSize.x
 	devConf.tileImage = love.graphics.newImage("images/craptileset.png")

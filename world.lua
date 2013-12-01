@@ -10,19 +10,35 @@ require("enemies")
 world.levels = {}
 world.characters = {}
 world.enemies = {}
-world.eventQueue = {}
+world.eventQueue = {level = {}, character = {}, enemy = {}}
 
+--[[
+Events are to be packed into this format:
+world.eventQueue.(level|character|enemy) = {eventName = data, ...}
+]]--
 function world.processEventQueue()
-	for key,value in pairs(world.eventQueue) do
-		if(key == "generate" and value) then
-			world.levels.test = level:newLevel()
-			world.levels.test:buildMap(unpack(value))
-			world.levels.test:buildSpriteBatch(32,32)
-			world.levels.test:buildQuads()
-			world.levels.test:populateSpriteBatch()
-			world.eventQueue.generate = nil
-		end
+	for eventType,event in pairs(world.eventQueue.level) do
+		world.processLevelEvent(eventType, event)
+		world.eventQueue.level[eventType] = nil
 	end
+end
+
+function world.processLevelEvent(eventType,event)
+	if(eventType == "generate") then
+		world.levels.test = level:newLevel()
+		world.levels.test:buildMap(unpack(event))
+		world.levels.test:buildSpriteBatch(32,32)
+		world.levels.test:buildQuads()
+		world.levels.test:populateSpriteBatch()
+	end
+end
+
+function world.processCharacterEvent(event)
+	
+end
+
+function world.processEnemyEvent(event)
+	
 end
 
 function world.draw()

@@ -24,14 +24,26 @@ function mapGeneration.runGenerate(script, map, seed, decay)
 	mapGeneration[script].generate(map,seed,decay)
 end
 
-function mapGeneration.runScript(script, map)
-	mapGeneration[script].run(map)
+function mapGeneration.runScript(script, map, ...)
+	mapGeneration[script].run(map, ...)
 end
 
-function mapGeneration.configure(script, parameter, value)
+function mapGeneration.configureVariable(script, parameter, value)
 	mapGeneration[script][parameter] = value
+end
+
+function mapGeneration.configureTable(script, parameter, tableIn)
+	for key, value in pairs(tableIn) do
+		mapGeneration[script][parameter][key] = value
+	end
 end
 
 function mapGeneration.getParameter(script, paramter)
 	return mapGeneration[script][parameter]
+end
+
+--TODO: Test. May not work correctly.
+function mapGeneration.getParameter(script, paramter)
+	local returnTable = mapGeneration[script][parameter]
+	return returnTable
 end

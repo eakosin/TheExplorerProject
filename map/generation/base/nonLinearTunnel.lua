@@ -2,7 +2,7 @@ require("helpers")
 
 local nonLinearTunnel = {}
 
-nonLinearTunnel.searchDistance = 9
+nonLinearTunnel.searchDistance = 13
 nonLinearTunnel.shortCircuit = 0
 nonLinearTunnel.terminationWeight = 90
 nonLinearTunnel.quickTerminate = false
