@@ -2,12 +2,21 @@ require("helpers")
 
 local nonLinearCave = {}
 
+--Configuration Parameters
+
 nonLinearCave.searchDistance = 2
 nonLinearCave.shortCircuit = 0
 nonLinearCave.secondTest = false
 
 nonLinearCave.pathingWeights = {primary = 50, secondary = 25}
 nonLinearCave.directionWeight = {north = 100, west = 75, east = 75, south = 35}
+
+--Create table of parameters
+nonLinearCave.parameters = helpers.keys(nonLinearCave)
+
+--Configuration Constraints
+
+--nonLinearCave.constraints.searchDistance = 
 
 function nonLinearCave.resetVariables()
 	nonLinearCave.searchDistance = 4

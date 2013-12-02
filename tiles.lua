@@ -9,7 +9,7 @@ function tiles:buildTileset(defFile)
 	tiles.tileset = {}
 	for line in love.filesystem.lines(tiles.defFile) do
 		name, char = line:split("|")
-		tiles.tileset[name] = char
+		tiles.tileset[name] = tonumber(char)
 	end
 end
 

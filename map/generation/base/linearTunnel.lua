@@ -2,6 +2,8 @@ require("helpers")
 
 local linearTunnel = {}
 
+--Configuration Parameters
+
 linearTunnel.searchDistance = 5
 linearTunnel.shortCircuit = 0
 linearTunnel.closeFunc = false
@@ -9,6 +11,13 @@ linearTunnel.searchShape = "diamond"
 
 linearTunnel.pathingWeights = {primary = 50, secondary = 25}
 linearTunnel.directionWeight = {north = 100, west = 75, east = 75, south = 50}
+
+--Create table of parameters
+linearTunnel.parameters = helpers.keys(linearTunnel)
+
+--Configuration Constraints
+
+--linearTunnel.constraints.searchDistance = 
 
 function linearTunnel.resetVariables()
 	linearTunnel.searchDistance = 4

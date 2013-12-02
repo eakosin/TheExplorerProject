@@ -51,7 +51,7 @@ function map:printReadableMap(spacer)
 	local conversion = {'.','+','#','~'}
 	for y=1,self.height do
 		for x=1,self.width do
-			io.write(conversion[tonumber(self.grid[x][y])]..spacer)
+			io.write(conversion[self.grid[x][y]]..spacer)
 		end
 		io.write("\n")
 	end

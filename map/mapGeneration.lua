@@ -20,8 +20,8 @@ function mapGeneration.testGeneration()
 	io.close()
 end
 
-function mapGeneration.runGenerate(script, map, seed, decay)
-	mapGeneration[script].generate(map,seed,decay)
+function mapGeneration.runGenerate(script, map, seed, ...)
+	mapGeneration[script].generate(map,seed,...)
 end
 
 function mapGeneration.runScript(script, map, ...)
@@ -38,12 +38,20 @@ function mapGeneration.configureTable(script, parameter, tableIn)
 	end
 end
 
-function mapGeneration.getParameter(script, paramter)
+function mapGeneration.getParameter(script, parameter)
 	return mapGeneration[script][parameter]
 end
 
 --TODO: Test. May not work correctly.
-function mapGeneration.getParameter(script, paramter)
+function mapGeneration.getTableParameter(script, parameter)
 	local returnTable = mapGeneration[script][parameter]
+	return returnTable
+end
+
+function mapGeneration.getParameterList(script)
+	local returnTable = mapGeneration[script].parameters
+	for key,value in pairs(returnTable) do
+		print(value)
+	end
 	return returnTable
 end

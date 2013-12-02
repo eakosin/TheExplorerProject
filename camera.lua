@@ -29,7 +29,7 @@ end
 
 function camera.getPosition()
 	camera.lx, camera.ly = camera.x, camera.y
-	return -camera.x, -camera.y
+	return camera.x, camera.y
 end
 
 function camera.getNegativePosition()

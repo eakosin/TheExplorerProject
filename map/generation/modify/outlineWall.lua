@@ -2,7 +2,16 @@ require("helpers")
 
 local outlineWalls = {}
 
+--Configuration Parameters
+
 outlineWalls.full = true
+
+--Create table of parameters
+outlineWalls.parameters = helpers.keys(outlineWalls)
+
+--Configuration Constraints
+
+--outlineWalls.constraints.searchDistance = 
 
 function outlineWalls.run(map)
 	local isFloor

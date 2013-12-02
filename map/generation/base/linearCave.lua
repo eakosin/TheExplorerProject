@@ -2,11 +2,20 @@ require("helpers")
 
 local linearCave = {}
 
+--Configuration Parameters
+
 linearCave.searchDistance = 20
 linearCave.shortCircuit = 0
 
 linearCave.pathingWeights = {primary = 50, secondary = 25}
 linearCave.directionWeight = {north = 100, west = 75, east = 75, south = 50}
+
+--Create table of parameters
+linearCave.parameters = helpers.keys(linearCave)
+
+--Configuration Constraints
+
+--linearCave.constraints.searchDistance = 
 
 function linearCave.resetVariables()
 	linearCave.searchDistance = 4
