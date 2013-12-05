@@ -4,16 +4,16 @@ tiles = {}
 tiles.defFile = "tileSet.def"
 tiles.tileset = {}
 
-function tiles:buildTileset(defFile)
+function tiles.buildTileset(defFile)
 	tiles.defFile = defFile or "tileSet.def"
 	tiles.tileset = {}
 	for line in love.filesystem.lines(tiles.defFile) do
-		name, char = line:split("|")
+		name, char = line:divide("|")
 		tiles.tileset[name] = tonumber(char)
 	end
 end
 
-function tiles:returnTileset()
+function tiles.returnTileset()
 	local tileset = tiles.tileset
 	return tileset
 end

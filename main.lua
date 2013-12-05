@@ -3,6 +3,7 @@ require("map/mapGeneration")
 require("helpers")
 require("world")
 require("camera")
+require("lcgrandom")
 
 gameState = "maptest"
 
@@ -12,8 +13,8 @@ activeKeys = {}
 devConf = {}
 devConf.seed = 95
 --Max of 16375 - Stack Size
-devConf.decay = 400
-devConf.mapType = "nonLinearTunnel"
+devConf.decay = 200
+devConf.mapType = "nonLinearCave"
 devConf.tileImage = nil
 devConf.mapSize = {x = 60,y = 60}
 devConf.tileSize = {x = 32,y = 32}

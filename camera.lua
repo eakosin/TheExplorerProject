@@ -32,6 +32,7 @@ function camera.getPosition()
 	return camera.x, camera.y
 end
 
+--Transform world coordinates to simulate camera direction.
 function camera.getNegativePosition()
 	camera.lx, camera.ly = camera.x, camera.y
 	return -camera.x, -camera.y

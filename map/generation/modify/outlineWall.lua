@@ -2,16 +2,27 @@ require("helpers")
 
 local outlineWalls = {}
 
---Configuration Parameters
+--[[
+ID System:
+Each script needs a unique id number.
+Generation scripts span 1000-1999
+Modify scripts span 2000-2999
+]]--
+outlineWalls.id = 2000
 
+--Configuration Parameters
 outlineWalls.full = true
 
 --Create table of parameters
 outlineWalls.parameters = helpers.keys(outlineWalls)
 
 --Configuration Constraints
-
---outlineWalls.constraints.searchDistance = 
+--See documentation(TODO)
+outlineWalls.constraint = {}
+for key,value in pairs(outlineWalls.parameters) do
+	outlineWalls.constraint[value] = {}
+end
+outlineWalls.constraint.full.select = {true,false}
 
 function outlineWalls.run(map)
 	local isFloor

@@ -2,28 +2,32 @@ require("helpers")
 
 local nonLinearCave = {}
 
---Configuration Parameters
+--[[
+ID System:
+Each script needs a unique id number.
+Generation scripts span 1000-1999
+Modify scripts span 2000-2999
+]]--
+nonLinearCave.id = 1000
 
+--Configuration Parameters
 nonLinearCave.searchDistance = 2
 nonLinearCave.shortCircuit = 0
+nonLinearCave.originalSearch = true
 nonLinearCave.secondTest = false
-
-nonLinearCave.pathingWeights = {primary = 50, secondary = 25}
 nonLinearCave.directionWeight = {north = 100, west = 75, east = 75, south = 35}
 
 --Create table of parameters
 nonLinearCave.parameters = helpers.keys(nonLinearCave)
 
 --Configuration Constraints
-
---nonLinearCave.constraints.searchDistance = 
+--nonLinearCave.constraint.searchDistance = 
 
 function nonLinearCave.resetVariables()
-	nonLinearCave.searchDistance = 4
+	nonLinearCave.searchDistance = 2
 	nonLinearCave.shortCircuit = 0
-	nonLinearCave.terminationWeight = 90
-	nonLinearCave.closeFunc = true
-	nonLinearCave.pathingWeights = {primary = 50, secondary = 25}
+	nonLinearCave.originalSearch = true
+	nonLinearCave.secondTest = false
 	nonLinearCave.directionWeight = {north = 100, west = 75, east = 75, south = 50}
 end
 
@@ -43,10 +47,48 @@ function nonLinearCave.compareAndNil(val1, val2)
 end
 
 function nonLinearCave.nearWall(map, x, y, direction, distance)
-	--print("nonLinearCave.nearWall("..x..","..y..","..direction..","..distance..")")
+	--This if clause replicates an algorithmic bug that produced
+	--fantastic results.
+	if(nonLinearCave.originalSearch and distance > 1) then
+		if(direction == "north") then
+			y = y - 1
+		elseif(direction == "south") then
+			y = y + 1
+		elseif(direction == "west") then
+			x = x - 1
+		elseif(direction == "east") then
+			x = x + 1
+		end
+	end
     isNearWall = false
-	if(distance<=0) then
-		return true
+	if(distance <= 1) then
+		if(direction == "north") then
+			if(((not map.grid[x-1]) or nonLinearCave.compareAndNil(map.grid[x-1][y-1], map.tileset.floor)) or 
+					nonLinearCave.compareAndNil(map.grid[x][y-1], map.tileset.floor) or 
+					((not map.grid[x+1]) or nonLinearCave.compareAndNil(map.grid[x+1][y-1], map.tileset.floor))) then
+				return true
+			end
+		elseif(direction == "south") then
+			if(((not map.grid[x-1]) or nonLinearCave.compareAndNil(map.grid[x-1][y+1], map.tileset.floor)) or 
+					nonLinearCave.compareAndNil(map.grid[x][y+1], map.tileset.floor) or 
+					((not map.grid[x+1]) or nonLinearCave.compareAndNil(map.grid[x+1][y+1], map.tileset.floor))) then
+				return true
+			end
+		elseif(direction == "west") then
+			if((not map.grid[x-1]) or 
+					(nonLinearCave.compareAndNil(map.grid[x-1][y-1], map.tileset.floor) or 
+					nonLinearCave.compareAndNil(map.grid[x-1][y], map.tileset.floor) or 
+					nonLinearCave.compareAndNil(map.grid[x-1][y+1], map.tileset.floor))) then
+				return true
+			end
+		elseif(direction == "east") then
+			if((not map.grid[x+1]) or 
+					(nonLinearCave.compareAndNil(map.grid[x+1][y+1], map.tileset.floor) or 
+					nonLinearCave.compareAndNil(map.grid[x+1][y], map.tileset.floor) or 
+					nonLinearCave.compareAndNil(map.grid[x+1][y-1], map.tileset.floor))) then
+				return true
+			end
+		end
 	else
 		if(direction == "north") then
 			if(((not map.grid[x-1]) or nonLinearCave.compareAndNil(map.grid[x-1][y-1], map.tileset.floor)) or 
@@ -98,23 +140,23 @@ end
 function nonLinearCave.newTile(map, x, y, direction, decay)
 	--print("nonLinearCave.newTile("..x..","..y..","..direction..","..decay..")")
 	map.grid[x][y] = map.tileset.floor
-	if(decay < math.random(0,100)) then
+	if(decay < lcgrandom.int(0,100)) then
 		--print("DECAYED")
 		return
 	end
 	if(direction == "north") then
 		if(nonLinearCave.nearEdge(map,x,y) == "north") then
-			if((math.random(0,100) <= 50) and (not nonLinearCave.nearWall(map,x,y,"west",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (not nonLinearCave.nearWall(map,x,y,"west",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
 				nonLinearCave.newTile(map,x-1,y,"west",decay-1)
 			elseif(not nonLinearCave.nearWall(map,x,y,"east",nonLinearCave.searchDistance-nonLinearCave.shortCircuit)) then
 				nonLinearCave.newTile(map,x+1,y,"east",decay-1)
 			end
 		else
 			local relativeDirectionWeight = nonLinearCave.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.north) and (not nonLinearCave.nearWall(map,x,y,"north",nonLinearCave.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.north) and (not nonLinearCave.nearWall(map,x,y,"north",nonLinearCave.searchDistance))) then
                 nonLinearCave.newTile(map,x,y-1,"north",decay-1)
 			end
-            if((math.random(1,100) <= relativeDirectionWeight.west) and (not nonLinearCave.nearWall(map,x,y,"west",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.west) and (not nonLinearCave.nearWall(map,x,y,"west",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
                 nonLinearCave.newTile(map,x-1,y,"west",decay-1)
 			end
             if(not nonLinearCave.nearWall(map,x,y,"east",nonLinearCave.searchDistance-nonLinearCave.shortCircuit)) then
@@ -126,17 +168,17 @@ function nonLinearCave.newTile(map, x, y, direction, decay)
 		end
 	elseif(direction == "south") then
 		if(nonLinearCave.nearEdge(map,x,y) == "south") then
-			if((math.random(0,100) <= 50) and (not nonLinearCave.nearWall(map,x,y,"east",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (not nonLinearCave.nearWall(map,x,y,"east",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
 				nonLinearCave.newTile(map,x+1,y,"east",decay-1)
 			elseif(not nonLinearCave.nearWall(map,x,y,"west",nonLinearCave.searchDistance-nonLinearCave.shortCircuit)) then
 				nonLinearCave.newTile(map,x-1,y,"west",decay-1)
 			end
 		else
 			local relativeDirectionWeight = nonLinearCave.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.south) and (not nonLinearCave.nearWall(map,x,y,"south",nonLinearCave.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.south) and (not nonLinearCave.nearWall(map,x,y,"south",nonLinearCave.searchDistance))) then
                 nonLinearCave.newTile(map,x,y+1,"south",decay-1)
 			end
-            if((math.random(1,100) <= relativeDirectionWeight.east) and (not nonLinearCave.nearWall(map,x,y,"east",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.east) and (not nonLinearCave.nearWall(map,x,y,"east",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
                 nonLinearCave.newTile(map,x+1,y,"east",decay-1)
 			end
             if(not nonLinearCave.nearWall(map,x,y,"west",nonLinearCave.searchDistance-nonLinearCave.shortCircuit)) then
@@ -148,17 +190,17 @@ function nonLinearCave.newTile(map, x, y, direction, decay)
 		end
 	elseif(direction == "west") then
 		if(nonLinearCave.nearEdge(map,x,y) == "west") then
-			if((math.random(0,100) <= 50) and (not nonLinearCave.nearWall(map,x,y,"south",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (not nonLinearCave.nearWall(map,x,y,"south",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
 				nonLinearCave.newTile(map,x,y+1,"south",decay-1)
 			elseif(not nonLinearCave.nearWall(map,x,y,"north",nonLinearCave.searchDistance-nonLinearCave.shortCircuit)) then
 				nonLinearCave.newTile(map,x,y-1,"north",decay-1)
 			end
 		else
 			local relativeDirectionWeight = nonLinearCave.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.west) and (not nonLinearCave.nearWall(map,x,y,"west",nonLinearCave.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.west) and (not nonLinearCave.nearWall(map,x,y,"west",nonLinearCave.searchDistance))) then
                 nonLinearCave.newTile(map,x-1,y,"west",decay-1)
 			end
-            if((math.random(1,100) <= relativeDirectionWeight.south) and (not nonLinearCave.nearWall(map,x,y,"south",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.south) and (not nonLinearCave.nearWall(map,x,y,"south",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
                 nonLinearCave.newTile(map,x,y+1,"south",decay-1)
 			end
             if(not nonLinearCave.nearWall(map,x,y,"north",nonLinearCave.searchDistance-nonLinearCave.shortCircuit)) then
@@ -170,17 +212,17 @@ function nonLinearCave.newTile(map, x, y, direction, decay)
 		end
 	elseif(direction == "east") then
 		if(nonLinearCave.nearEdge(map,x,y) == "east") then
-			if((math.random(0,100) <= 50) and (not nonLinearCave.nearWall(map,x,y,"north",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (not nonLinearCave.nearWall(map,x,y,"north",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
 				nonLinearCave.newTile(map,x,y-1,"north",decay-1)
 			elseif(not nonLinearCave.nearWall(map,x,y,"south",nonLinearCave.searchDistance-nonLinearCave.shortCircuit)) then
 				nonLinearCave.newTile(map,x,y+1,"south",decay-1)
 			end
 		else
 			local relativeDirectionWeight = nonLinearCave.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.east) and (not nonLinearCave.nearWall(map,x,y,"east",nonLinearCave.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.east) and (not nonLinearCave.nearWall(map,x,y,"east",nonLinearCave.searchDistance))) then
                 nonLinearCave.newTile(map,x+1,y,"east",decay-1)
 			end
-            if((math.random(1,100) <= relativeDirectionWeight.north) and (not nonLinearCave.nearWall(map,x,y,"north",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.north) and (not nonLinearCave.nearWall(map,x,y,"north",nonLinearCave.searchDistance-nonLinearCave.shortCircuit))) then
                 nonLinearCave.newTile(map,x,y-1,"north",decay-1)
 			end
             if(not nonLinearCave.nearWall(map,x,y,"south",nonLinearCave.searchDistance-nonLinearCave.shortCircuit)) then
@@ -195,8 +237,8 @@ function nonLinearCave.newTile(map, x, y, direction, decay)
 end
 			
 function nonLinearCave.generate(map, seed, decay)
-	math.randomseed(seed)
-	nonLinearCave.newTile(map,math.random((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
+	lcgrandom.seed(seed)
+	nonLinearCave.newTile(map,lcgrandom.int((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return
 end
 

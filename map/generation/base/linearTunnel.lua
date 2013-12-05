@@ -2,29 +2,32 @@ require("helpers")
 
 local linearTunnel = {}
 
---Configuration Parameters
+--[[
+ID System:
+Each script needs a unique id number.
+Generation scripts span 1000-1999
+Modify scripts span 2000-2999
+]]--
+linearTunnel.id = 1002
 
+--Configuration Parameters
 linearTunnel.searchDistance = 5
 linearTunnel.shortCircuit = 0
 linearTunnel.closeFunc = false
 linearTunnel.searchShape = "diamond"
-
-linearTunnel.pathingWeights = {primary = 50, secondary = 25}
 linearTunnel.directionWeight = {north = 100, west = 75, east = 75, south = 50}
 
 --Create table of parameters
 linearTunnel.parameters = helpers.keys(linearTunnel)
 
 --Configuration Constraints
-
---linearTunnel.constraints.searchDistance = 
+--linearTunnel.constraint.searchDistance = 
 
 function linearTunnel.resetVariables()
 	linearTunnel.searchDistance = 4
 	linearTunnel.shortCircuit = 0
 	linearTunnel.closeFunc = false
 	linearTunnel.shape = "column"
-	linearTunnel.pathingWeights = {primary = 50, secondary = 25}
 	linearTunnel.directionWeight = {north = 100, west = 75, east = 75, south = 50}
 end
 
@@ -205,22 +208,22 @@ end
 function linearTunnel.newTile(map, x, y, direction, decay)
 	--print("linearTunnel.newTile("..x..","..y..","..direction..","..decay..")")
 	map.grid[x][y] = map.tileset.floor
-	if(decay < math.random(0,100)) then
+	if(decay < lcgrandom.int(0,100)) then
 		--print("DECAYED")
 		return
 	end
 	if(direction == "north") then
 		if(linearTunnel.nearEdge(map,x,y) == "north") then
-			if((math.random(0,100) <= 50) and (not linearTunnel.nearWall(map,x,y,"west",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (not linearTunnel.nearWall(map,x,y,"west",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
 				linearTunnel.newTile(map,x-1,y,"west",decay-1)
 			elseif(not linearTunnel.nearWall(map,x,y,"east",linearTunnel.searchDistance-linearTunnel.shortCircuit)) then
 				linearTunnel.newTile(map,x+1,y,"east",decay-1)
 			end
 		else
 			local relativeDirectionWeight = linearTunnel.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.north) and (not linearTunnel.nearWall(map,x,y,"north",linearTunnel.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.north) and (not linearTunnel.nearWall(map,x,y,"north",linearTunnel.searchDistance))) then
                 linearTunnel.newTile(map,x,y-1,"north",decay-1)
-            elseif((math.random(1,100) <= relativeDirectionWeight.west) and (not linearTunnel.nearWall(map,x,y,"west",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
+            elseif((lcgrandom.int(1,100) <= relativeDirectionWeight.west) and (not linearTunnel.nearWall(map,x,y,"west",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
                 linearTunnel.newTile(map,x-1,y,"west",decay-1)
             elseif(not linearTunnel.nearWall(map,x,y,"east",linearTunnel.searchDistance-linearTunnel.shortCircuit)) then
                 linearTunnel.newTile(map,x+1,y,"east",decay-1)
@@ -230,16 +233,16 @@ function linearTunnel.newTile(map, x, y, direction, decay)
 		end
 	elseif(direction == "south") then
 		if(linearTunnel.nearEdge(map,x,y) == "south") then
-			if((math.random(0,100) <= 50) and (not linearTunnel.nearWall(map,x,y,"east",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (not linearTunnel.nearWall(map,x,y,"east",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
 				linearTunnel.newTile(map,x+1,y,"east",decay-1)
 			elseif(not linearTunnel.nearWall(map,x,y,"west",linearTunnel.searchDistance-linearTunnel.shortCircuit)) then
 				linearTunnel.newTile(map,x-1,y,"west",decay-1)
 			end
 		else
 			local relativeDirectionWeight = linearTunnel.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.south) and (not linearTunnel.nearWall(map,x,y,"south",linearTunnel.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.south) and (not linearTunnel.nearWall(map,x,y,"south",linearTunnel.searchDistance))) then
                 linearTunnel.newTile(map,x,y+1,"south",decay-1)
-            elseif((math.random(1,100) <= relativeDirectionWeight.east) and (not linearTunnel.nearWall(map,x,y,"east",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
+            elseif((lcgrandom.int(1,100) <= relativeDirectionWeight.east) and (not linearTunnel.nearWall(map,x,y,"east",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
                 linearTunnel.newTile(map,x+1,y,"east",decay-1)
             elseif(not linearTunnel.nearWall(map,x,y,"west",linearTunnel.searchDistance-linearTunnel.shortCircuit)) then
                 linearTunnel.newTile(map,x-1,y,"west",decay-1)
@@ -249,16 +252,16 @@ function linearTunnel.newTile(map, x, y, direction, decay)
 		end
 	elseif(direction == "west") then
 		if(linearTunnel.nearEdge(map,x,y) == "west") then
-			if((math.random(0,100) <= 50) and (not linearTunnel.nearWall(map,x,y,"south",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (not linearTunnel.nearWall(map,x,y,"south",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
 				linearTunnel.newTile(map,x,y+1,"south",decay-1)
 			elseif(not linearTunnel.nearWall(map,x,y,"north",linearTunnel.searchDistance-linearTunnel.shortCircuit)) then
 				linearTunnel.newTile(map,x,y-1,"north",decay-1)
 			end
 		else
 			local relativeDirectionWeight = linearTunnel.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.west) and (not linearTunnel.nearWall(map,x,y,"west",linearTunnel.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.west) and (not linearTunnel.nearWall(map,x,y,"west",linearTunnel.searchDistance))) then
                 linearTunnel.newTile(map,x-1,y,"west",decay-1)
-            elseif((math.random(1,100) <= relativeDirectionWeight.south) and (not linearTunnel.nearWall(map,x,y,"south",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
+            elseif((lcgrandom.int(1,100) <= relativeDirectionWeight.south) and (not linearTunnel.nearWall(map,x,y,"south",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
                 linearTunnel.newTile(map,x,y+1,"south",decay-1)
             elseif(not linearTunnel.nearWall(map,x,y,"north",linearTunnel.searchDistance-linearTunnel.shortCircuit)) then
                 linearTunnel.newTile(map,x,y-1,"north",decay-1)
@@ -268,16 +271,16 @@ function linearTunnel.newTile(map, x, y, direction, decay)
 		end
 	elseif(direction == "east") then
 		if(linearTunnel.nearEdge(map,x,y) == "east") then
-			if((math.random(0,100) <= 50) and (not linearTunnel.nearWall(map,x,y,"north",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (not linearTunnel.nearWall(map,x,y,"north",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
 				linearTunnel.newTile(map,x,y-1,"north",decay-1)
 			elseif(not linearTunnel.nearWall(map,x,y,"south",linearTunnel.searchDistance-linearTunnel.shortCircuit)) then
 				linearTunnel.newTile(map,x,y+1,"south",decay-1)
 			end
 		else
 			local relativeDirectionWeight = linearTunnel.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.east) and (not linearTunnel.nearWall(map,x,y,"east",linearTunnel.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.east) and (not linearTunnel.nearWall(map,x,y,"east",linearTunnel.searchDistance))) then
                 linearTunnel.newTile(map,x+1,y,"east",decay-1)
-            elseif((math.random(1,100) <= relativeDirectionWeight.north) and (not linearTunnel.nearWall(map,x,y,"north",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
+            elseif((lcgrandom.int(1,100) <= relativeDirectionWeight.north) and (not linearTunnel.nearWall(map,x,y,"north",linearTunnel.searchDistance-linearTunnel.shortCircuit))) then
                 linearTunnel.newTile(map,x,y-1,"north",decay-1)
             elseif(not linearTunnel.nearWall(map,x,y,"south",linearTunnel.searchDistance-linearTunnel.shortCircuit)) then
                 linearTunnel.newTile(map,x,y+1,"south",decay-1)
@@ -290,8 +293,8 @@ function linearTunnel.newTile(map, x, y, direction, decay)
 end
 			
 function linearTunnel.generate(map, seed, decay)
-	math.randomseed(seed)
-	linearTunnel.newTile(map,math.random((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
+	lcgrandom.seed(seed)
+	linearTunnel.newTile(map,lcgrandom.int((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return
 end
 

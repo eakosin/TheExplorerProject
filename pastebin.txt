@@ -1,0 +1,63 @@
+world.lua~~~~~~~
+
+function world.processEventQueue()
+	for eventType,event in pairs(world.eventQueue.level) do
+		world.processLevelEvent(eventType, event)
+		world.eventQueue.level[eventType] = nil
+	end
+end
+
+function world.processLevelEvent(eventType,event)
+	if(eventType == "generate") then
+		world.levels.test = level:newLevel()
+		world.levels.test:buildMap(unpack(event))
+		world.levels.test:buildSpriteBatch(32,32)
+		world.levels.test:buildQuads()
+		world.levels.test:populateSpriteBatch()
+	end
+end
+
+level.lua~~~~~~~
+
+function level:buildMap(script,width,height,seed,decay)
+	self.image = love.graphics.newImage("images/craptileset.png")
+	self.map = map:new()
+	self.map:buildMap(width,height)
+	--Compute Timer
+	local timerVal, timerVal2
+	timerVal = love.timer.getTime()
+	mapGeneration.getParameterList("nonLinearTunnel")
+	mapGeneration.runGenerate(script,self.map,seed,decay)
+	mapGeneration.runScript("outlineWall",self.map)
+	timerVal2 = love.timer.getTime()
+	print(timerVal2 - timerVal)
+	io.output("./mapoutput.grid", "w")
+	self.map:printReadableMap(" ")
+	io.close()
+end
+
+
+function level:buildSpriteBatch(tsx,tsy)
+	self.spriteBatch = love.graphics.newSpriteBatch(self.image,1000000)
+	self.tsx, self.tsy = tsx,tsy
+end
+
+function level:buildQuads()
+	self.quads = {}
+	self.numTilesX = helpers.int(self.image:getWidth()/self.tsx)
+	self.numTilesY = helpers.int(self.image:getHeight()/self.tsy)
+	for tx = 1,self.numTilesX do
+		for ty = 1,self.numTilesY do
+			self.quads[tx+((ty-1)*self.numTilesX)] = love.graphics.newQuad(((tx-1)*self.tsx),((ty-1)*self.tsy),self.tsx,self.tsy,self.image:getWidth(),self.image:getHeight())
+		end
+	end
+end
+
+function level:populateSpriteBatch()
+	self.map:addMapLayer("spriteBatchID",0)
+	for x=1,self.map.width do
+		for y=1,self.map.height do
+			self.map.spriteBatchID[x][y] = self.spriteBatch:add(self.quads[self.map.grid[x][y]],((x-1)*self.tsx),((y-1)*self.tsy))
+		end
+	end
+end

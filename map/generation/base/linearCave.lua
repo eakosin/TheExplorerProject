@@ -2,27 +2,28 @@ require("helpers")
 
 local linearCave = {}
 
---Configuration Parameters
+--[[
+ID System:
+Each script needs a unique id number.
+Generation scripts span 1000-1999
+Modify scripts span 2000-2999
+]]--
+linearCave.id = 1001
 
+--Configuration Parameters
 linearCave.searchDistance = 20
 linearCave.shortCircuit = 0
-
-linearCave.pathingWeights = {primary = 50, secondary = 25}
 linearCave.directionWeight = {north = 100, west = 75, east = 75, south = 50}
 
 --Create table of parameters
 linearCave.parameters = helpers.keys(linearCave)
 
 --Configuration Constraints
-
---linearCave.constraints.searchDistance = 
+--linearCave.constraint.searchDistance = 
 
 function linearCave.resetVariables()
-	linearCave.searchDistance = 4
+	linearCave.searchDistance = 20
 	linearCave.shortCircuit = 0
-	linearCave.closeFunc = false
-	linearCave.shape = "column"
-	linearCave.pathingWeights = {primary = 50, secondary = 25}
 	linearCave.directionWeight = {north = 100, west = 75, east = 75, south = 50}
 end
 
@@ -97,22 +98,22 @@ end
 function linearCave.newTile(map, x, y, direction, decay)
 	--print("linearCave.newTile("..x..","..y..","..direction..","..decay..")")
 	map.grid[x][y] = map.tileset.floor
-	if(decay < math.random(0,100)) then
+	if(decay < lcgrandom.int(0,100)) then
 		--print("DECAYED")
 		return
 	end
 	if(direction == "north") then
 		if(linearCave.nearEdge(map,x,y) == "north") then
-			if((math.random(0,100) <= 50) and (linearCave.nearWall(map,x,y,"west",linearCave.searchDistance-linearCave.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (linearCave.nearWall(map,x,y,"west",linearCave.searchDistance-linearCave.shortCircuit))) then
 				linearCave.newTile(map,x-1,y,"west",decay-1)
 			elseif(linearCave.nearWall(map,x,y,"east",linearCave.searchDistance-linearCave.shortCircuit)) then
 				linearCave.newTile(map,x+1,y,"east",decay-1)
 			end
 		else
 			local relativeDirectionWeight = linearCave.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.north) and (linearCave.nearWall(map,x,y,"north",linearCave.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.north) and (linearCave.nearWall(map,x,y,"north",linearCave.searchDistance))) then
                 linearCave.newTile(map,x,y-1,"north",decay-1)
-            elseif((math.random(1,100) <= relativeDirectionWeight.west) and (linearCave.nearWall(map,x,y,"west",linearCave.searchDistance-linearCave.shortCircuit))) then
+            elseif((lcgrandom.int(1,100) <= relativeDirectionWeight.west) and (linearCave.nearWall(map,x,y,"west",linearCave.searchDistance-linearCave.shortCircuit))) then
                 linearCave.newTile(map,x-1,y,"west",decay-1)
             elseif(linearCave.nearWall(map,x,y,"east",linearCave.searchDistance-linearCave.shortCircuit)) then
                 linearCave.newTile(map,x+1,y,"east",decay-1)
@@ -122,16 +123,16 @@ function linearCave.newTile(map, x, y, direction, decay)
 		end
 	elseif(direction == "south") then
 		if(linearCave.nearEdge(map,x,y) == "south") then
-			if((math.random(0,100) <= 50) and (linearCave.nearWall(map,x,y,"east",linearCave.searchDistance-linearCave.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (linearCave.nearWall(map,x,y,"east",linearCave.searchDistance-linearCave.shortCircuit))) then
 				linearCave.newTile(map,x+1,y,"east",decay-1)
 			elseif(linearCave.nearWall(map,x,y,"west",linearCave.searchDistance-linearCave.shortCircuit)) then
 				linearCave.newTile(map,x-1,y,"west",decay-1)
 			end
 		else
 			local relativeDirectionWeight = linearCave.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.south) and (linearCave.nearWall(map,x,y,"south",linearCave.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.south) and (linearCave.nearWall(map,x,y,"south",linearCave.searchDistance))) then
                 linearCave.newTile(map,x,y+1,"south",decay-1)
-            elseif((math.random(1,100) <= relativeDirectionWeight.east) and (linearCave.nearWall(map,x,y,"east",linearCave.searchDistance-linearCave.shortCircuit))) then
+            elseif((lcgrandom.int(1,100) <= relativeDirectionWeight.east) and (linearCave.nearWall(map,x,y,"east",linearCave.searchDistance-linearCave.shortCircuit))) then
                 linearCave.newTile(map,x+1,y,"east",decay-1)
             elseif(linearCave.nearWall(map,x,y,"west",linearCave.searchDistance-linearCave.shortCircuit)) then
                 linearCave.newTile(map,x-1,y,"west",decay-1)
@@ -141,16 +142,16 @@ function linearCave.newTile(map, x, y, direction, decay)
 		end
 	elseif(direction == "west") then
 		if(linearCave.nearEdge(map,x,y) == "west") then
-			if((math.random(0,100) <= 50) and (linearCave.nearWall(map,x,y,"south",linearCave.searchDistance-linearCave.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (linearCave.nearWall(map,x,y,"south",linearCave.searchDistance-linearCave.shortCircuit))) then
 				linearCave.newTile(map,x,y+1,"south",decay-1)
 			elseif(linearCave.nearWall(map,x,y,"north",linearCave.searchDistance-linearCave.shortCircuit)) then
 				linearCave.newTile(map,x,y-1,"north",decay-1)
 			end
 		else
 			local relativeDirectionWeight = linearCave.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.west) and (linearCave.nearWall(map,x,y,"west",linearCave.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.west) and (linearCave.nearWall(map,x,y,"west",linearCave.searchDistance))) then
                 linearCave.newTile(map,x-1,y,"west",decay-1)
-            elseif((math.random(1,100) <= relativeDirectionWeight.south) and (linearCave.nearWall(map,x,y,"south",linearCave.searchDistance-linearCave.shortCircuit))) then
+            elseif((lcgrandom.int(1,100) <= relativeDirectionWeight.south) and (linearCave.nearWall(map,x,y,"south",linearCave.searchDistance-linearCave.shortCircuit))) then
                 linearCave.newTile(map,x,y+1,"south",decay-1)
             elseif(linearCave.nearWall(map,x,y,"north",linearCave.searchDistance-linearCave.shortCircuit)) then
                 linearCave.newTile(map,x,y-1,"north",decay-1)
@@ -160,16 +161,16 @@ function linearCave.newTile(map, x, y, direction, decay)
 		end
 	elseif(direction == "east") then
 		if(linearCave.nearEdge(map,x,y) == "east") then
-			if((math.random(0,100) <= 50) and (linearCave.nearWall(map,x,y,"north",linearCave.searchDistance-linearCave.shortCircuit))) then
+			if((lcgrandom.int(0,100) <= 50) and (linearCave.nearWall(map,x,y,"north",linearCave.searchDistance-linearCave.shortCircuit))) then
 				linearCave.newTile(map,x,y-1,"north",decay-1)
 			elseif(linearCave.nearWall(map,x,y,"south",linearCave.searchDistance-linearCave.shortCircuit)) then
 				linearCave.newTile(map,x,y+1,"south",decay-1)
 			end
 		else
 			local relativeDirectionWeight = linearCave.computeRelativePathWeight(map,x,y)
-            if((math.random(1,100) <= relativeDirectionWeight.east) and (linearCave.nearWall(map,x,y,"east",linearCave.searchDistance))) then
+            if((lcgrandom.int(1,100) <= relativeDirectionWeight.east) and (linearCave.nearWall(map,x,y,"east",linearCave.searchDistance))) then
                 linearCave.newTile(map,x+1,y,"east",decay-1)
-            elseif((math.random(1,100) <= relativeDirectionWeight.north) and (linearCave.nearWall(map,x,y,"north",linearCave.searchDistance-linearCave.shortCircuit))) then
+            elseif((lcgrandom.int(1,100) <= relativeDirectionWeight.north) and (linearCave.nearWall(map,x,y,"north",linearCave.searchDistance-linearCave.shortCircuit))) then
                 linearCave.newTile(map,x,y-1,"north",decay-1)
             elseif(linearCave.nearWall(map,x,y,"south",linearCave.searchDistance-linearCave.shortCircuit)) then
                 linearCave.newTile(map,x,y+1,"south",decay-1)
@@ -182,8 +183,8 @@ function linearCave.newTile(map, x, y, direction, decay)
 end
 			
 function linearCave.generate(map, seed, decay)
-	math.randomseed(seed)
-	linearCave.newTile(map,math.random((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
+	lcgrandom.seed(seed)
+	linearCave.newTile(map,lcgrandom.int((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return
 end
 
