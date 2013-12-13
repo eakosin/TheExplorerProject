@@ -24,68 +24,72 @@ function mapGeneration.generate(level)
 	--Temporarily static. Other scripts have not been correctly setup.
 	scripts.base = {id = 4}
 	scripts.base.script = mapGeneration.base.ids[scripts.base.id]
-	level.scripts.base = {id = scripts.base.id, parameters = {}}
-	mapGeneration.configureScript(scripts.base.script,level)
-	mapGeneration.runScript(scripts.base.script,level.maps.base)
+	level.layers.terrain.scripts = {}
+	level.layers.terrain.scripts.base = {[scripts.base.id] = {}}
+	mapGeneration.configureScript(scripts.base.script,"base","terrain",level)
+	mapGeneration.runScript(scripts.base.script,level.layers.terrain.map)
+	level.layers.terrain.tileImageName = scripts.base.script.tileImageName
 	--Modify - TODO: Should run all important scripts that match base ids.
 	--e.g. - cleanup.lua, outlineWall.lua, etc.
 	scripts.modify = {id = level.lcgrandom:int(1,#mapGeneration.modify.ids)}
 	scripts.modify.script = mapGeneration.modify.ids[scripts.modify.id]
-	level.scripts.modify = {id = scripts.modify.id, parameters = {}}
-	--mapGeneration.configureScript(scripts.modify.script,level)
-	mapGeneration.runScript(scripts.modify.script,level.maps.base)
+	level.layers.terrain.modify = {[scripts.modify.id] = {}}
+	--mapGeneration.configureScript(scripts.modify.script,"modify","terrain",level)
+	mapGeneration.runScript(scripts.modify.script,level.layers.terrain.map)
 	io.output("./mapoutput.grid", "w")
-	level.maps.base:printReadableMap(" ")
+	level.layers.terrain.map:printReadableMap(" ")
 	io.close()
 end
 
-function mapGeneration.configureScript(script,level)
+function mapGeneration.configureScript(script,scriptType,layer,level)
 	local constraint
 	local dependList = {}
 	for _,parameter in pairs(script.parameters) do
 		if(script.constraint[parameter].range) then
 			constraint = script.constraint[parameter].range
 			script[parameter] = level.lcgrandom:int(unpack(constraint))
-			level.scripts.base.parameters[parameter] = script[parameter]
+			level.layers[layer].scripts[scriptType][script.id][parameter] = script[parameter]
 		elseif(script.constraint[parameter].select) then
 			constraint = script.constraint[parameter].select
 			script[parameter] = constraint[level.lcgrandom:int(1,#constraint)]
-			level.scripts.base.parameters[parameter] = script[parameter]
+			level.layers[layer].scripts[scriptType][script.id][parameter] = script[parameter]
 		elseif(script.constraint[parameter].seed) then
 			script[parameter] = level.lcgrandom:int32()
-			level.scripts.base.parameters[parameter] = script[parameter]
+			level.layers[layer].scripts[scriptType][script.id][parameter] = script[parameter]
 		elseif(script.constraint[parameter].procedure) then
 			constraint = level.lcgrandom:int32()
 			script.constraint[parameter].procedure(constraint)
-			level.scripts.base.parameters[parameter] = script[parameter]
+			level.layers[layer].scripts[scriptType][script.id][parameter] = script[parameter]
 		elseif(script.constraint[parameter].depend) then
 			dependList[#dependList + 1] = parameter
+		elseif(script.constraint[parameter].none) then
+			level.layers[layer].scripts[scriptType][script.id][parameter] = script[parameter]
 		end
 		--Print Parameters DEBUG
-		if(type(level.scripts.base.parameters[parameter]) == "table") then
+		if(type(level.layers[layer].scripts[scriptType][script.id][parameter]) == "table") then
 			print(parameter..":")
-			for k,v in pairs(level.scripts.base.parameters[parameter]) do
+			for k,v in pairs(level.layers[layer].scripts[scriptType][script.id][parameter]) do
 				print(k,v)
 			end
 		else
-			print(parameter, level.scripts.base.parameters[parameter])
+			print(parameter, level.layers[layer].scripts[scriptType][script.id][parameter])
 		end
 	end
 	print("Depend:")
 	--Depend Constraints
 	constraint = level.lcgrandom:int32()
 	script.constraint.depend(constraint)
-	level.scripts.base.parameters.depend = constraint
+	level.layers[layer].scripts[scriptType][script.id].depend = constraint
 	for _,parameter in pairs(dependList) do
-		level.scripts.base.parameters[parameter] = script[parameter]
+		level.layers[layer].scripts[scriptType][script.id][parameter] = script[parameter]
 		--Print Depend Parameters DEBUG
-		if(type(level.scripts.base.parameters[parameter]) == "table") then
+		if(type(level.layers[layer].scripts[scriptType][script.id][parameter]) == "table") then
 			print(parameter..":")
-			for k,v in pairs(level.scripts.base.parameters[parameter]) do
+			for k,v in pairs(level.layers[layer].scripts[scriptType][script.id][parameter]) do
 				print(k,v)
 			end
 		else
-			print(parameter, level.scripts.base.parameters[parameter])
+			print(parameter, level.layers[layer].scripts[scriptType][script.id][parameter])
 		end
 	end
 end

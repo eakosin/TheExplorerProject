@@ -10,6 +10,7 @@ require("enemies")
 
 world.lcgrandom = lcgrandom:new()
 world.camera = nil
+world.levelChange = false
 
 world.levels = {}
 world.characters = {}
@@ -41,7 +42,9 @@ function world.processWorldEvent(event)
 			world.levels[id] = level:new()
 			world.levels[id].name = "level"..id
 			world.levels[id]:generate(world.lcgrandom:int32())
+			world.levels[id]:prepareSpriteBatches()
 		end
+		world.levelChange = true
 	elseif(event.name == "destroylevels") then
 		world.levels = {}
 		collectgarbage("collect")
@@ -69,6 +72,13 @@ function world.processEnemyEvent(id, event)
 end
 
 function world.draw()
+	--Temporary camera bounding until the camera is controlled by the Character object.
+	if(world.levelChange) then
+		world.camera.configureBoundries(world.levels[world.currentLevel].width,world.levels[world.currentLevel].height,world.levels[world.currentLevel].tileSize.x,world.levels[world.currentLevel].tileSize.y)
+		local levelStart = world.levels[world.currentLevel].layers.terrain.map.start
+		world.camera.setPosition(((levelStart.x * 32) - 400), (levelStart.y * 32))
+		world.levelChange = false
+	end
 	world.levels[world.currentLevel]:draw()
 end
 

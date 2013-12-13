@@ -10,6 +10,7 @@ Modify scripts span 2000-2999
 ]]--
 nonLinearTunnel.id = 4
 nonLinearTunnel.name = "Branching Tunnel 1"
+nonLinearTunnel.tileImageName = "craptileset.png"
 
 --Configuration Parameters
 nonLinearTunnel.seed = 0
@@ -33,6 +34,7 @@ for key,value in pairs(nonLinearTunnel.parameters) do
 end
 nonLinearTunnel.constraint.id.none = true
 nonLinearTunnel.constraint.name.none = true
+nonLinearTunnel.constraint.tileImageName.none = true
 nonLinearTunnel.constraint.seed.seed = true
 nonLinearTunnel.constraint.decay.range = {125,225}
 nonLinearTunnel.constraint.searchDistance.range = {3,17}
@@ -99,32 +101,6 @@ function nonLinearTunnel.nearWall(map, x, y, direction, distance)
 	if(nonLinearTunnel.searchShape == "column") then
 		if(distance<=0) then
 			return false
-		elseif(distance == 1 and nonLinearTunnel.quickTerminate) then
-			if(direction == "north") then
-				if(nonLinearTunnel.compareAndNil(map.grid[x][y-1], map.tileset.floor)) then
-					return true
-				else
-					isNearWall = isNearWall or nonLinearTunnel.nearWall(map,x,y-1,"north",distance-1)
-				end
-			elseif(direction == "south") then
-				if(nonLinearTunnel.compareAndNil(map.grid[x][y+1], map.tileset.floor)) then
-					return true
-				else
-					isNearWall = isNearWall or nonLinearTunnel.nearWall(map,x,y+1,"south",distance-1)
-				end
-			elseif(direction == "west") then
-				if((not map.grid[x-1]) or nonLinearTunnel.compareAndNil(map.grid[x-1][y], map.tileset.floor)) then
-					return true
-				else
-					isNearWall = isNearWall or nonLinearTunnel.nearWall(map,x-1,y,"west",distance-1)
-				end
-			elseif(direction == "east") then
-				if((not map.grid[x+1]) or nonLinearTunnel.compareAndNil(map.grid[x+1][y], map.tileset.floor)) then
-					return true
-				else
-					isNearWall = isNearWall or nonLinearTunnel.nearWall(map,x+1,y,"east",distance-1)
-				end
-			end
 		else
 			if(direction == "north") then
 				if(((not map.grid[x-1]) or nonLinearTunnel.compareAndNil(map.grid[x-1][y-1], map.tileset.floor)) or 
@@ -193,7 +169,7 @@ function nonLinearTunnel.nearWall(map, x, y, direction, distance)
 				isNearWall = isNearWall or 
 					(not map.grid[tx(positionAhead,positionSide)]) or
 					nonLinearTunnel.compareAndNil(map.grid[tx(positionAhead,positionSide)][ty(positionAhead,positionSide)], map.tileset.floor)
-				--print(direction,"x:"..x,"y:"..y,"tx:"..tx(positionAhead,positionSide),"ty:"..ty(positionAhead,positionSide),map.grid[tx(positionAhead,positionSide)][ty(positionAhead,positionSide)],isNearWall)
+				print(direction,"x:"..x,"y:"..y,"tx:"..tx(positionAhead,positionSide),"ty:"..ty(positionAhead,positionSide),map.grid[tx(positionAhead,positionSide)][ty(positionAhead,positionSide)],isNearWall)
 			end
 			positionAhead = positionAhead - 2
 		end
@@ -253,7 +229,7 @@ function nonLinearTunnel.nearEdge(map, x, y)
 end
 
 function nonLinearTunnel.newTile(map, x, y, direction, decay, termination)
-	--print("nonLinearTunnel.newTile("..x..","..y..","..direction..","..decay..")")
+	print("nonLinearTunnel.newTile("..x..","..y..","..direction..","..decay..")")
 	map.grid[x][y] = map.tileset.floor
 	if(decay < nonLinearTunnel.random:int(0,100)) then
 		--print("DECAYED")
@@ -353,7 +329,8 @@ end
 			
 function nonLinearTunnel.run(map)
 	nonLinearTunnel.random:seed(nonLinearTunnel.seed)
-	nonLinearTunnel.newTile(map,nonLinearTunnel.random:int(helpers.int(map.width / 4),helpers.int((map.width * 3) / 4)),map.height,"north",nonLinearTunnel.decay,nonLinearTunnel.terminationWeight)
+	map.start = {x = nonLinearTunnel.random:int(helpers.int(map.width / 4),helpers.int((map.width * 3) / 4)), y = map.height,}
+	nonLinearTunnel.newTile(map,map.start.x,map.start.y,"north",nonLinearTunnel.decay,nonLinearTunnel.terminationWeight)
 	return
 end
 

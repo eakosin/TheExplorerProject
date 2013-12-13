@@ -30,14 +30,13 @@ function love.keyreleased(key)
 end
 
 function love.load()
-	--1386895069
 	--One: 1386895053
-	world.initialize(1386895053)
+	world.initialize(1386895052)
 	world.camera = camera
 	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "generatelevels"}
 	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = 1}
-	camera.tileBound.x, camera.tileBound.y = devConf.mapSize.x, devConf.mapSize.y
-	camera.tileSize.x, camera.tileSize.y = devConf.tileSize.x, devConf.tileSize.x
+	--camera.tileBound.x, camera.tileBound.y = devConf.mapSize.x, devConf.mapSize.y
+	--camera.tileSize.x, camera.tileSize.y = devConf.tileSize.x, devConf.tileSize.x
 	--devConf.testCanvas = love.graphics.newCanvas(love.graphics.getWidth(),love.graphics.getHeight())
 end
 

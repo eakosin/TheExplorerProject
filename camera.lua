@@ -8,6 +8,11 @@ camera.ly = 0
 camera.tileBound = {x = 0, y = 0}
 camera.tileSize = {x = 32, y = 32}
 
+function camera.configureBoundries(tileBoundX, tileBoundY, tileSizeX, tileSizeY)
+	camera.tileBound.x, camera.tileBound.y = tileBoundX, tileBoundY
+	camera.tileSize.x, camera.tileSize.y = tileSizeX, tileSizeY
+end
+
 function camera.bound(value,lower,upper)
 	return (value > upper and upper) or (value < lower and lower) or value
 end
@@ -19,7 +24,7 @@ function camera.move(x,y)
 	camera.y = camera.bound(camera.y,0,((camera.tileBound.y*camera.tileSize.y)-600))
 end
 
-function camera.setposition(x,y)
+function camera.setPosition(x,y)
 	camera.x = x
 	camera.x = camera.bound(camera.x,0,((camera.tileBound.x*camera.tileSize.x)-800))
 	camera.y = y
