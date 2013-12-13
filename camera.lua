@@ -19,6 +19,13 @@ function camera.move(x,y)
 	camera.y = camera.bound(camera.y,0,((camera.tileBound.y*camera.tileSize.y)-600))
 end
 
+function camera.setposition(x,y)
+	camera.x = x
+	camera.x = camera.bound(camera.x,0,((camera.tileBound.x*camera.tileSize.x)-800))
+	camera.y = y
+	camera.y = camera.bound(camera.y,0,((camera.tileBound.y*camera.tileSize.y)-600))
+end
+
 function camera.dx()
 	return camera.x - camera.lx
 end

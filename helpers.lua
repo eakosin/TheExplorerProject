@@ -19,8 +19,6 @@ function string:divide(pattern)
 	return self:sub(0,(left-1)), self:sub(right+1)
 end
 
-
-
 helpers = {}
 
 --Using an index is slower in tables less than 10000 items in size.
@@ -69,11 +67,9 @@ Using helpers.int():8.5221269808244e-007 sec
 
 function helpers.odd(value,up)
 	if(value > 0) then
-		return math.floor(value)
+		value = math.floor(value)
 	elseif(value < 0) then
-		return math.ceil(value)
-	else
-		return 0
+		value = math.ceil(value)
 	end
 	if(value == 0) then
 		return ((up and 1) or -1)
@@ -97,4 +93,59 @@ function helpers.even(value,up)
 	else
 		return value
 	end
+end
+
+function helpers.clamp(value,lower,upper)
+	if(value < lower) then
+		return lower
+	elseif(value > upper) then
+		return upper
+	else
+		return value
+	end
+end
+
+weighting = {}
+
+--[[
+Best with a value between 0.0 and 1.0.
+Value from -1.0 to 1.0 will use dual slopes.
+power - controls the knee size.
+scale - scales the output via multiplication.
+shift - shifts the weighting curve
+]]--
+function weighting.exp(x,power,scale,width,shifth,shiftv)
+	power = power or 3
+	scale = scale or 100
+	width = width or 1
+	shifth = shifth or 0
+	shiftv = shiftv or 0
+	return (((math.abs(((x * (1 / width)) + (shifth / scale)) ^ power)) * scale) + shiftv)
+end
+
+function weighting.invExp(x,power,scale,width,shifth,shiftv)
+	power = power or 3
+	scale = scale or 100
+	width = width or 1
+	shifth = shifth or 0
+	shiftv = shiftv or 0
+	return ((((-math.abs(((x * (1 / width)) + (shifth / scale)) ^ power)) + 1) * scale) + shiftv)
+end
+
+function weighting.oddExp(x,power,scale,width,shifth,shiftv)
+	power = helpers.odd(power,true) or 3
+	scale = scale or 100
+	width = width or 1
+	shifth = shifth or 0
+	shiftv = shiftv or 0
+	return (((((x * (1 / width)) + (shifth / scale)) ^ power) * (scale / 2)) + (scale / 2) + shiftv)
+end
+
+function weighting.circular(x,power,scale,width,shifth,shiftv)
+	power = power or 2
+	scale = scale or 100
+	width = width or 1
+	shifth = shifth or 0
+	shiftv = shiftv or 0
+	return ((((1 - math.abs(((x * (1 / width)) + (shifth / scale))^power))^0.5) * scale) + shiftv)
 end

@@ -56,17 +56,3 @@ function map:printReadableMap(spacer)
 		io.write("\n")
 	end
 end
-
---[[
-function map:setTile(x,y,value)
-	self.grid[x][y] = value
-end
-
-function map:getTile(x,y)
-	return self.grid[x][y]
-end
-
-function map:getTileType(value)
-	return self.tileset[value]
-end
-]]--

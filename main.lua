@@ -11,10 +11,10 @@ activeKeys = {}
 
 --Special settings for development
 devConf = {}
-devConf.seed = 95
+devConf.seed = 96
 --Max of 16375 - Stack Size
 devConf.decay = 200
-devConf.mapType = "nonLinearCave"
+devConf.script = "nonLinearTunnel"
 devConf.tileImage = nil
 devConf.mapSize = {x = 60,y = 60}
 devConf.tileSize = {x = 32,y = 32}
@@ -30,15 +30,18 @@ function love.keyreleased(key)
 end
 
 function love.load()
-	world.eventQueue.level["generate"] = {devConf.mapType,devConf.mapSize.x,devConf.mapSize.y,devConf.seed,devConf.decay}
+	--1386895069
+	--One: 1386895053
+	world.initialize(1386895053)
+	world.camera = camera
+	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "generatelevels"}
+	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = 1}
 	camera.tileBound.x, camera.tileBound.y = devConf.mapSize.x, devConf.mapSize.y
 	camera.tileSize.x, camera.tileSize.y = devConf.tileSize.x, devConf.tileSize.x
 	--devConf.testCanvas = love.graphics.newCanvas(love.graphics.getWidth(),love.graphics.getHeight())
 end
 
 function love.update(dt)
-	--Main loop
-	
 	love.event.pump()
 	if(activeKeys.escape) then
 		love.event.quit()

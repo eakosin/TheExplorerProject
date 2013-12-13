@@ -8,13 +8,17 @@ Each script needs a unique id number.
 Generation scripts span 1000-1999
 Modify scripts span 2000-2999
 ]]--
-nonLinearTunnel.id = 1003
+nonLinearTunnel.id = 4
+nonLinearTunnel.name = "Branching Tunnel 1"
 
 --Configuration Parameters
+nonLinearTunnel.seed = 0
+nonLinearTunnel.decay = 200
 nonLinearTunnel.searchDistance = 13
 nonLinearTunnel.shortCircuit = 0
 nonLinearTunnel.searchShape = "square"
-nonLinearTunnel.secondTest = true
+nonLinearTunnel.relativeWeights = true
+nonLinearTunnel.leftOnFailure = true
 nonLinearTunnel.terminationWeight = 100
 nonLinearTunnel.terminationStep = 0
 nonLinearTunnel.directionWeight = {north = 100, west = 75, east = 75, south = 35}
@@ -27,34 +31,62 @@ nonLinearTunnel.constraint = {}
 for key,value in pairs(nonLinearTunnel.parameters) do
 	nonLinearTunnel.constraint[value] = {}
 end
-nonLinearTunnel.constraint.searchDistance.range = {3,21}
-nonLinearTunnel.constraint.shortCircuit.range = {0,19}
---nonLinearTunnel.constraints.shortCircuit.function = function (value) return (((value + 1) < nonLinearTunnel.searchDistance and value) or nonLinearTunnel.searchDistance) end
-nonLinearTunnel.constraint.searchShape.select = {"square", "diamond", "column"}
-nonLinearTunnel.constraint.secondTest.select = {true, false}
-nonLinearTunnel.constraint.terminationWeight.range = {0,100}
-nonLinearTunnel.constraint.terminationStep.range = {0,100}
-nonLinearTunnel.constraint.directionWeight.tablerange = {north = {75,100}, west = {45,95}, east = {45,95}, south = {10,50}}
+nonLinearTunnel.constraint.id.none = true
+nonLinearTunnel.constraint.name.none = true
+nonLinearTunnel.constraint.seed.seed = true
+nonLinearTunnel.constraint.decay.range = {125,225}
+nonLinearTunnel.constraint.searchDistance.range = {3,17}
+nonLinearTunnel.constraint.shortCircuit.depend = true
+nonLinearTunnel.constraint.searchShape.select = {"square","square","diamond","diamond","column"}
+nonLinearTunnel.constraint.relativeWeights.select = {true,true,true,true,false,false}
+nonLinearTunnel.constraint.leftOnFailure.select = {true,false}
+nonLinearTunnel.constraint.terminationWeight.range = {92,100}
+nonLinearTunnel.constraint.terminationStep.select = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,4,4,4,5,5,6,6,7,8}
+nonLinearTunnel.constraint.directionWeight.procedure = function (seed)
+	local lcgrandomLocal = lcgrandom:new()
+	lcgrandomLocal:seed(seed)
+	nonLinearTunnel.directionWeight.north = helpers.clamp(weighting.invExp(lcgrandomLocal:float(),4,100,1.075,0,0),0,100)
+	nonLinearTunnel.directionWeight.south = helpers.clamp(weighting.oddExp(lcgrandomLocal:float(),3,100,0.55,-80,-15),0,100)
+	nonLinearTunnel.directionWeight.west = helpers.clamp(weighting.oddExp(lcgrandomLocal:float(),3,100,0.55,-110,25),0,100)
+	nonLinearTunnel.directionWeight.east = helpers.clamp(weighting.oddExp(lcgrandomLocal:float(),3,100,0.55,-110,25),0,100)
+end
+nonLinearTunnel.constraint.depend = function (seed)
+	local lcgrandomLocal = lcgrandom:new()
+	lcgrandomLocal:seed(seed)
+	nonLinearTunnel.shortCircuit = helpers.int(helpers.clamp(weighting.exp(lcgrandomLocal:float(),8,(nonLinearTunnel.searchDistance - 3),1,0,0),0,(nonLinearTunnel.searchDistance - 3)))
+end
+nonLinearTunnel.random = lcgrandom:new()
 
 function nonLinearTunnel.resetVariables()
-	nonLinearTunnel.searchDistance = 7
+	nonLinearTunnel.seed = 0
+	nonLinearTunnel.decay = 200
+	nonLinearTunnel.searchDistance = 13
 	nonLinearTunnel.shortCircuit = 0
 	nonLinearTunnel.searchShape = "square"
+	nonLinearTunnel.relativeWeights = true
 	nonLinearTunnel.secondTest = true
+	nonLinearTunnel.leftOnFailure = true
 	nonLinearTunnel.terminationWeight = 100
 	nonLinearTunnel.terminationStep = 0
 	nonLinearTunnel.directionWeight = {north = 100, west = 75, east = 75, south = 35}
 end
 
 function nonLinearTunnel.computeRelativePathWeight(map, x, y)
-    nPer = y / map.height
-    sPer = (map.height-y) / map.height
-    ePer = (map.width-x) / map.width
-    wPer = x / map.width
-    return {north = helpers.int(nonLinearTunnel.directionWeight.north * nPer),
-			west = helpers.int(nonLinearTunnel.directionWeight.west * wPer),
-			east = helpers.int(nonLinearTunnel.directionWeight.east * ePer),
-			south = helpers.int(nonLinearTunnel.directionWeight.south * sPer)}
+	if(nonLinearTunnel.relativeWeights) then
+		nPer = y / map.height
+		sPer = (map.height-y) / map.height
+		ePer = (map.width-x) / map.width
+		wPer = x / map.width
+		return {north = helpers.int(nonLinearTunnel.directionWeight.north * nPer),
+				west = helpers.int(nonLinearTunnel.directionWeight.west * wPer),
+				east = helpers.int(nonLinearTunnel.directionWeight.east * ePer),
+				south = helpers.int(nonLinearTunnel.directionWeight.south * sPer)}
+	else
+		return {north = nonLinearTunnel.directionWeight.north,
+				west = nonLinearTunnel.directionWeight.west,
+				east = nonLinearTunnel.directionWeight.east,
+				south = nonLinearTunnel.directionWeight.south}
+	end
 end
 
 function nonLinearTunnel.compareAndNil(val1, val2)
@@ -131,7 +163,7 @@ function nonLinearTunnel.nearWall(map, x, y, direction, distance)
 			end
 		end
 	elseif(nonLinearTunnel.searchShape == "diamond") then
-		local distance = helpers.odd(distance,up)
+		local distance = helpers.odd(distance,true)
 		isNearWall = false
 		positionAhead, halfDistance = distance, (helpers.int(distance / 2))
 		local tx = function(ahead, side)
@@ -166,7 +198,7 @@ function nonLinearTunnel.nearWall(map, x, y, direction, distance)
 			positionAhead = positionAhead - 2
 		end
 	elseif(nonLinearTunnel.searchShape == "square") then
-		local distance = helpers.odd(distance,up)
+		local distance = helpers.odd(distance,true)
 		isNearWall = false
 		positionAhead, halfDistance = distance, (helpers.int(distance / 2))
 		local tx = function(ahead, side)
@@ -223,95 +255,95 @@ end
 function nonLinearTunnel.newTile(map, x, y, direction, decay, termination)
 	--print("nonLinearTunnel.newTile("..x..","..y..","..direction..","..decay..")")
 	map.grid[x][y] = map.tileset.floor
-	if(decay < lcgrandom.int(0,100)) then
+	if(decay < nonLinearTunnel.random:int(0,100)) then
 		--print("DECAYED")
 		return
 	end
 	if(direction == "north") then
 		if(nonLinearTunnel.nearEdge(map,x,y) == "north") then
-			if((lcgrandom.int(0,100) <= 50) and (not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
+			if((nonLinearTunnel.random:int(0,100) <= 50) and (not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
 				nonLinearTunnel.newTile(map,x-1,y,"west",decay-1,nonLinearTunnel.terminationWeight)
 			elseif(not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit)) then
 				nonLinearTunnel.newTile(map,x+1,y,"east",decay-1,nonLinearTunnel.terminationWeight)
 			end
 		else
 			local relativeDirectionWeight = nonLinearTunnel.computeRelativePathWeight(map,x,y)
-            if((lcgrandom.int(1,100) <= relativeDirectionWeight.north) and (not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance))) then
+            if((nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.north) and (not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance))) then
                 nonLinearTunnel.newTile(map,x,y-1,"north",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if((lcgrandom.int(1,100) <= relativeDirectionWeight.west) and (not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
+            if((nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.west) and (not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
                 nonLinearTunnel.newTile(map,x-1,y,"west",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if(not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit)) then
+            if((nonLinearTunnel.leftOnFailure or (nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.east)) and (not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
                 nonLinearTunnel.newTile(map,x+1,y,"east",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if(nonLinearTunnel.secondTest and (lcgrandom.int(1,100) <= termination) and (not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance))) then
+            if((nonLinearTunnel.random:int(1,100) <= termination) and (not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance))) then
                 nonLinearTunnel.newTile(map,x,y-1,"north",decay-1,(termination-nonLinearTunnel.terminationStep))
 			end
 		end
 	elseif(direction == "south") then
 		if(nonLinearTunnel.nearEdge(map,x,y) == "south") then
-			if((lcgrandom.int(0,100) <= 50) and (not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
+			if((nonLinearTunnel.random:int(0,100) <= 50) and (not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
 				nonLinearTunnel.newTile(map,x+1,y,"east",decay-1,nonLinearTunnel.terminationWeight)
 			elseif(not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit)) then
 				nonLinearTunnel.newTile(map,x-1,y,"west",decay-1,nonLinearTunnel.terminationWeight)
 			end
 		else
 			local relativeDirectionWeight = nonLinearTunnel.computeRelativePathWeight(map,x,y)
-            if((lcgrandom.int(1,100) <= relativeDirectionWeight.south) and (not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance))) then
+            if((nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.south) and (not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance))) then
                 nonLinearTunnel.newTile(map,x,y+1,"south",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if((lcgrandom.int(1,100) <= relativeDirectionWeight.east) and (not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
+            if((nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.east) and (not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
                 nonLinearTunnel.newTile(map,x+1,y,"east",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if(not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit)) then
+            if((nonLinearTunnel.leftOnFailure or (nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.west)) and (not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
                 nonLinearTunnel.newTile(map,x-1,y,"west",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if(nonLinearTunnel.secondTest and (lcgrandom.int(1,100) <= termination) and (not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance))) then
+            if((nonLinearTunnel.random:int(1,100) <= termination) and (not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance))) then
                 nonLinearTunnel.newTile(map,x,y+1,"south",decay-1,(termination-nonLinearTunnel.terminationStep))
 			end
 		end
 	elseif(direction == "west") then
 		if(nonLinearTunnel.nearEdge(map,x,y) == "west") then
-			if((lcgrandom.int(0,100) <= 50) and (not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
+			if((nonLinearTunnel.random:int(0,100) <= 50) and (not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
 				nonLinearTunnel.newTile(map,x,y+1,"south",decay-1,nonLinearTunnel.terminationWeight)
 			elseif(not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit)) then
 				nonLinearTunnel.newTile(map,x,y-1,"north",decay-1,nonLinearTunnel.terminationWeight)
 			end
 		else
 			local relativeDirectionWeight = nonLinearTunnel.computeRelativePathWeight(map,x,y)
-            if((lcgrandom.int(1,100) <= relativeDirectionWeight.west) and (not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance))) then
+            if((nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.west) and (not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance))) then
                 nonLinearTunnel.newTile(map,x-1,y,"west",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if((lcgrandom.int(1,100) <= relativeDirectionWeight.south) and (not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
+            if((nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.south) and (not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
                 nonLinearTunnel.newTile(map,x,y+1,"south",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if(not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit)) then
+            if((nonLinearTunnel.leftOnFailure or (nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.north)) and (not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
                 nonLinearTunnel.newTile(map,x,y-1,"north",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if(nonLinearTunnel.secondTest and (lcgrandom.int(1,100) <= termination) and (not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance))) then
+            if((nonLinearTunnel.random:int(1,100) <= termination) and (not nonLinearTunnel.nearWall(map,x,y,"west",nonLinearTunnel.searchDistance))) then
                 nonLinearTunnel.newTile(map,x-1,y,"west",decay-1,(termination-nonLinearTunnel.terminationStep))
 			end
 		end
 	elseif(direction == "east") then
 		if(nonLinearTunnel.nearEdge(map,x,y) == "east") then
-			if((lcgrandom.int(0,100) <= 50) and (not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
+			if((nonLinearTunnel.random:int(0,100) <= 50) and (not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
 				nonLinearTunnel.newTile(map,x,y-1,"north",decay-1,nonLinearTunnel.terminationWeight)
 			elseif(not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit)) then
 				nonLinearTunnel.newTile(map,x,y+1,"south",decay-1,nonLinearTunnel.terminationWeight)
 			end
 		else
 			local relativeDirectionWeight = nonLinearTunnel.computeRelativePathWeight(map,x,y)
-            if((lcgrandom.int(1,100) <= relativeDirectionWeight.east) and (not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance))) then
+            if((nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.east) and (not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance))) then
                 nonLinearTunnel.newTile(map,x+1,y,"east",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if((lcgrandom.int(1,100) <= relativeDirectionWeight.north) and (not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
+            if((nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.north) and (not nonLinearTunnel.nearWall(map,x,y,"north",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
                 nonLinearTunnel.newTile(map,x,y-1,"north",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if(not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit)) then
+            if((nonLinearTunnel.leftOnFailure or (nonLinearTunnel.random:int(1,100) <= relativeDirectionWeight.south)) and (not nonLinearTunnel.nearWall(map,x,y,"south",nonLinearTunnel.searchDistance-nonLinearTunnel.shortCircuit))) then
                 nonLinearTunnel.newTile(map,x,y+1,"south",decay-1,nonLinearTunnel.terminationWeight)
 			end
-            if(nonLinearTunnel.secondTest and (lcgrandom.int(1,100) <= termination) and (not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance))) then
+            if((nonLinearTunnel.random:int(1,100) <= termination) and (not nonLinearTunnel.nearWall(map,x,y,"east",nonLinearTunnel.searchDistance))) then
                 nonLinearTunnel.newTile(map,x+1,y,"east",decay-1,(termination-nonLinearTunnel.terminationStep))
 			end
 		end
@@ -319,9 +351,9 @@ function nonLinearTunnel.newTile(map, x, y, direction, decay, termination)
 	return
 end
 			
-function nonLinearTunnel.generate(map, seed, decay)
-	lcgrandom.seed(seed)
-	nonLinearTunnel.newTile(map,lcgrandom.int((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay,nonLinearTunnel.terminationWeight)
+function nonLinearTunnel.run(map)
+	nonLinearTunnel.random:seed(nonLinearTunnel.seed)
+	nonLinearTunnel.newTile(map,nonLinearTunnel.random:int(helpers.int(map.width / 4),helpers.int((map.width * 3) / 4)),map.height,"north",nonLinearTunnel.decay,nonLinearTunnel.terminationWeight)
 	return
 end
 

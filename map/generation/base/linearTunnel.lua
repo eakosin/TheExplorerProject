@@ -8,7 +8,8 @@ Each script needs a unique id number.
 Generation scripts span 1000-1999
 Modify scripts span 2000-2999
 ]]--
-linearTunnel.id = 1002
+linearTunnel.id = 3
+linearTunnel.name = "Single Path Tunnel 1"
 
 --Configuration Parameters
 linearTunnel.searchDistance = 5
@@ -292,7 +293,7 @@ function linearTunnel.newTile(map, x, y, direction, decay)
 	return
 end
 			
-function linearTunnel.generate(map, seed, decay)
+function linearTunnel.run(map, seed, decay)
 	lcgrandom.seed(seed)
 	linearTunnel.newTile(map,lcgrandom.int((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return

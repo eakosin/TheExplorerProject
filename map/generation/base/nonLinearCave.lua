@@ -8,7 +8,8 @@ Each script needs a unique id number.
 Generation scripts span 1000-1999
 Modify scripts span 2000-2999
 ]]--
-nonLinearCave.id = 1000
+nonLinearCave.id = 1
+nonLinearCave.name = "Cave 1"
 
 --Configuration Parameters
 nonLinearCave.searchDistance = 2
@@ -236,7 +237,7 @@ function nonLinearCave.newTile(map, x, y, direction, decay)
 	return
 end
 			
-function nonLinearCave.generate(map, seed, decay)
+function nonLinearCave.run(map, seed, decay)
 	lcgrandom.seed(seed)
 	nonLinearCave.newTile(map,lcgrandom.int((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return

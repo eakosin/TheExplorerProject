@@ -8,7 +8,8 @@ Each script needs a unique id number.
 Generation scripts span 1000-1999
 Modify scripts span 2000-2999
 ]]--
-linearCave.id = 1001
+linearCave.id = 2
+linearCave.name = "Single Path Cave 1"
 
 --Configuration Parameters
 linearCave.searchDistance = 20
@@ -182,7 +183,7 @@ function linearCave.newTile(map, x, y, direction, decay)
 	return
 end
 			
-function linearCave.generate(map, seed, decay)
+function linearCave.run(map, seed, decay)
 	lcgrandom.seed(seed)
 	linearCave.newTile(map,lcgrandom.int((map.width / 4),((map.width * 3) / 4)),map.height,"north",decay)
 	return

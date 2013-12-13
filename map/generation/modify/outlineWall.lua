@@ -8,7 +8,8 @@ Each script needs a unique id number.
 Generation scripts span 1000-1999
 Modify scripts span 2000-2999
 ]]--
-outlineWalls.id = 2000
+outlineWalls.id = 1
+outlineWalls.name = "Walls 1"
 
 --Configuration Parameters
 outlineWalls.full = true
@@ -22,7 +23,13 @@ outlineWalls.constraint = {}
 for key,value in pairs(outlineWalls.parameters) do
 	outlineWalls.constraint[value] = {}
 end
+outlineWalls.constraint.id.none = true
+outlineWalls.constraint.name.none = true
 outlineWalls.constraint.full.select = {true,false}
+
+function outlineWalls.resetVariables()
+	outlineWalls.full = true
+end
 
 function outlineWalls.run(map)
 	local isFloor
