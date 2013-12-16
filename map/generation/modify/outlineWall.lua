@@ -5,8 +5,7 @@ local outlineWalls = {}
 --[[
 ID System:
 Each script needs a unique id number.
-Generation scripts span 1000-1999
-Modify scripts span 2000-2999
+Starting at 1.
 ]]--
 outlineWalls.id = 1
 outlineWalls.name = "Walls 1"
@@ -25,7 +24,7 @@ for key,value in pairs(outlineWalls.parameters) do
 end
 outlineWalls.constraint.id.none = true
 outlineWalls.constraint.name.none = true
-outlineWalls.constraint.full.select = {true,false}
+outlineWalls.constraint.full.none = true
 
 function outlineWalls.resetVariables()
 	outlineWalls.full = true

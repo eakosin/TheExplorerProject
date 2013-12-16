@@ -21,6 +21,18 @@ end
 
 helpers = {}
 
+function helpers.clearDebugLog()
+	file = io.open("./debugLog.txt", "w")
+	file:write("")
+	file:close()
+end
+
+function helpers.debugLog(text)
+	file = io.open("./debugLog.txt", "a")
+	file:write(tostring(text).."\n")
+	file:close()
+end
+
 --Using an index is slower in tables less than 10000 items in size.
 function helpers.keys(tblin)
 	local keys = {}

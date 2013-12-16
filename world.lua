@@ -27,6 +27,7 @@ world.eventQueue.world[id] = {eventParameter = value, ...}
 ]]--
 function world.processEventQueue()
 	for id,event in pairs(world.eventQueue.world) do
+		print(event.name)
 		world.processWorldEvent(event)
 		world.eventQueue.world[id] = nil
 	end
@@ -39,17 +40,30 @@ end
 function world.processWorldEvent(event)
 	if(event.name == "generatelevels") then
 		for id = 1, 1 do
+			print("Level: "..tostring(id))
 			world.levels[id] = level:new()
 			world.levels[id].name = "level"..id
 			world.levels[id]:generate(world.lcgrandom:int32())
 			world.levels[id]:prepareSpriteBatches()
+			print("Address: "..tostring(world.levels[id]))
+			world.levels[id]:clearParameters()
 		end
+		print("Memory: "..tostring(collectgarbage("count")))
+		collectgarbage("restart")
 		world.levelChange = true
 	elseif(event.name == "destroylevels") then
-		world.levels = {}
+		if(event.ids) then
+			for i = 1, #event.ids do
+				world.levels[event.ids[i]] = nil
+			end
+		else
+			world.levels = {}
+		end
 		collectgarbage("collect")
 	elseif(event.name == "changelevel") then
 		world.currentLevel = event.id
+		world.levelChange = true
+		print("levelid: "..tonumber(world.currentLevel))
 	end
 end
 
@@ -74,19 +88,26 @@ end
 function world.draw()
 	--Temporary camera bounding until the camera is controlled by the Character object.
 	if(world.levelChange) then
-		world.camera.configureBoundries(world.levels[world.currentLevel].width,world.levels[world.currentLevel].height,world.levels[world.currentLevel].tileSize.x,world.levels[world.currentLevel].tileSize.y)
-		local levelStart = world.levels[world.currentLevel].layers.terrain.map.start
-		world.camera.setPosition(((levelStart.x * 32) - 400), (levelStart.y * 32))
+		world.camera.configureBoundries(world.levels[world.currentLevel].terrain.map.width,
+										world.levels[world.currentLevel].terrain.map.height,
+										world.levels[world.currentLevel].tileSize.x,
+										world.levels[world.currentLevel].tileSize.y,
+										world.drawingCanvas:getDimensions())
+		local levelStart = world.levels[world.currentLevel].terrain.map.start
+		helpers.debugLog(world.drawingCanvas)
+		world.camera.setPosition(((levelStart.x * 32) - (world.drawingCanvas:getDimensions() / 2)), (levelStart.y * 32))
 		world.levelChange = false
+		print("world.currentLevel: "..tostring(world.levels[world.currentLevel]))
 	end
 	world.levels[world.currentLevel]:draw()
 end
 
-function world.initialize(staticSeed, ...)
-	seed = staticSeed or os.time()
-	seed = world.lcgrandom:seed(seed)
-	mapGeneration.loadScripts()
-	if(...) then
-		--TODO: Bypass game to test scripts with controllable parameters.
+function world.initialize(parameters)
+	for key,value in pairs(parameters) do
+		world[key] = value
 	end
+	world.seed = world.seed or os.time()
+	world.lcgrandom:seed(world.seed)
+	helpers.debugLog("World Seed: "..tostring(world.seed))
+	mapGeneration.loadScripts()
 end

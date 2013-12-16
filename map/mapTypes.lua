@@ -10,6 +10,7 @@ function map:new(new)
 	new = new or {}
 	setmetatable(new, self)
 	self.__index = self
+	self.grid = {}
 	return new
 end
 

@@ -5,21 +5,26 @@ require("world")
 require("camera")
 require("lcgrandom")
 
-gameState = "maptest"
+helpers.clearDebugLog()
+
+dev = {}
+dev.cameraSpeed = 8
 
 activeKeys = {}
 
---Special settings for development
-devConf = {}
-devConf.seed = 96
---Max of 16375 - Stack Size
-devConf.decay = 200
-devConf.script = "nonLinearTunnel"
-devConf.tileImage = nil
-devConf.mapSize = {x = 60,y = 60}
-devConf.tileSize = {x = 32,y = 32}
-devConf.cameraSpeed = 8
-devConf.testCanvas = nil
+inputLock = {}
+
+function inputLock:lock(input)
+	if(self[input]) then
+		return false
+	end
+	self[input] = true
+	return true
+end
+
+function inputLock:unlock(input)
+	self[input] = false
+end
 
 function love.keypressed(key)
 	activeKeys[key] = true
@@ -27,17 +32,22 @@ end
 
 function love.keyreleased(key)
 	activeKeys[key] = nil
+	inputLock:unlock(key)
 end
 
+canvas = {}
+
 function love.load()
+	local screenWidth, screenHeight = love.window.getDesktopDimensions(1)
+	love.graphics.setDefaultFilter("linear", "nearest", 8)
+	canvas.diffuse = love.graphics.newCanvas(screenWidth / 2, screenHeight / 2)
+	love.graphics.setDefaultFilter("linear", "linear", 8)
+	canvas.primary = love.graphics.newCanvas()
 	--One: 1386895053
-	world.initialize(1386895052)
-	world.camera = camera
+	--seed = 1387229252
+	world.initialize{camera = camera, drawingCanvas = canvas.diffuse}
 	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "generatelevels"}
 	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = 1}
-	--camera.tileBound.x, camera.tileBound.y = devConf.mapSize.x, devConf.mapSize.y
-	--camera.tileSize.x, camera.tileSize.y = devConf.tileSize.x, devConf.tileSize.x
-	--devConf.testCanvas = love.graphics.newCanvas(love.graphics.getWidth(),love.graphics.getHeight())
 end
 
 function love.update(dt)
@@ -46,33 +56,48 @@ function love.update(dt)
 		love.event.quit()
 	end
 	if(activeKeys.up) then
-		camera.move(0,-devConf.cameraSpeed)
+		camera.move(0,-dev.cameraSpeed)
 	end
 	if(activeKeys.down) then
-		camera.move(0,devConf.cameraSpeed)
+		camera.move(0,dev.cameraSpeed)
 	end
 	if(activeKeys.left) then
-		camera.move(-devConf.cameraSpeed,0)
+		camera.move(-dev.cameraSpeed,0)
 	end
 	if(activeKeys.right) then
-		camera.move(devConf.cameraSpeed,0)
+		camera.move(dev.cameraSpeed,0)
+	end
+	if(activeKeys.n) then
+		if(inputLock:lock("n")) then
+			level = helpers.clamp((level + 1), 1, #world.levels)
+			world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = helpers.clamp((world.currentLevel + 1),1,#world.currentLevel)}
+		end
+	end
+	if(activeKeys.p) then
+		if(inputLock:lock("p")) then
+			level = helpers.clamp((level - 1), 1, #world.levels)
+			world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = helpers.clamp((world.currentLevel - 1),1,#world.currentLevel)}
+		end
 	end
 	world.processEventQueue()
-	if(camera.dx() ~= 0 or camera.dy() ~= 0) then
-		print("dx: "..camera.dx(),"dy: "..camera.dy(),"x: "..camera.x,"y: "..camera.y)
-	end
 end
+
+timeStart = 0
 
 --Draw scene
 function love.draw()
+	--timeStart = love.timer.getTime()
 	love.graphics.translate(camera.getNegativePosition())
-	--love.graphics.setCanvas(devConf.testCanvas)
+	love.graphics.setCanvas(canvas.diffuse)
 	
 	world.draw()
 	
-	--love.graphics.setCanvas()
-	--love.graphics.origin()
-	--love.graphics.draw(devConf.testCanvas)
+	love.graphics.setCanvas(canvas.primary)
+	love.graphics.origin()
+	love.graphics.draw(canvas.diffuse,0,0,0,2,2)
+	love.graphics.setCanvas()
+	love.graphics.draw(canvas.primary)
+	--helpers.debugLog(love.timer.getTime() - timeStart)
 end
 
 --Quitting
@@ -84,7 +109,7 @@ end
 function love.run()
 
     if love.math then
-        love.math.setRandomState(os.time())
+        love.math.setRandomSeed(os.time())
     end
 
     if love.event then
