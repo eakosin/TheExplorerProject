@@ -98,17 +98,17 @@ end
 
 function level:processEvent(event)
 	if(event.name == "collision") then
-		debugLog:append(tostring(helpers.int((event.x + 32) / 32))..","..tostring(helpers.int(((event.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.x / 32) + 32)][helpers.int((event.y / 32))]))
-		if(self.terrain.map.grid[helpers.int((event.x + 32) / 32)][helpers.int(((event.y + event.dn + 32) / 32))] == self.terrain.map.tileset.wall) then
+		--debugLog:append(tostring(helpers.int((event.x + 32) / 32))..","..tostring(helpers.int(((event.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.x / 32) + 32)][helpers.int((event.y / 32))]))
+		if(self.terrain.map.grid[helpers.int((event.x + 24) / 32)][helpers.int(((event.y + event.dn + 24) / 32))] == self.terrain.map.tileset.wall) then
 			event.object.canMove.north = false
 		end
-		if(self.terrain.map.grid[helpers.int((event.x + 32) / 32)][helpers.int(((event.y + event.ds + 32) / 32))] == self.terrain.map.tileset.wall) then
+		if(self.terrain.map.grid[helpers.int((event.x + 24) / 32)][helpers.int(((event.y + event.ds + 24) / 32))] == self.terrain.map.tileset.wall) then
 			event.object.canMove.south = false
 		end
-		if(self.terrain.map.grid[helpers.int((event.x + event.dw + 32) / 32)][helpers.int(((event.y + 32) / 32))] == self.terrain.map.tileset.wall) then
+		if(self.terrain.map.grid[helpers.int((event.x + event.dw + 24) / 32)][helpers.int(((event.y + 24) / 32))] == self.terrain.map.tileset.wall) then
 			event.object.canMove.west = false
 		end
-		if(self.terrain.map.grid[helpers.int((event.x + event.de + 32) / 32)][helpers.int(((event.y + 32) / 32))] == self.terrain.map.tileset.wall) then
+		if(self.terrain.map.grid[helpers.int((event.x + event.de + 24) / 32)][helpers.int(((event.y + 24) / 32))] == self.terrain.map.tileset.wall) then
 			event.object.canMove.east = false
 		end
 	end

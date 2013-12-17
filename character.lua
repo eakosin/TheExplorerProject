@@ -74,10 +74,10 @@ function character:move()
 	if(self.canMove.east) then
 		self.x = self.x + self.de
 	end
-	character.canMove.north = true
-	character.canMove.south = true
-	character.canMove.west = true
-	character.canMove.east = true
+	self.canMove.north = true
+	self.canMove.south = true
+	self.canMove.west = true
+	self.canMove.east = true
 end
 
 function character:draw()
