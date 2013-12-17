@@ -19,6 +19,26 @@ function string:divide(pattern)
 	return self:sub(0,(left-1)), self:sub(right+1)
 end
 
+debugLog = {}
+debugLog.text = ""
+
+function debugLog:clear()
+	file = io.open("./debugLog.txt", "w")
+	file:write("")
+	file:close()
+end
+
+function debugLog:append(text)
+	self.text = self.text..tostring(text).."\n"
+end
+
+function debugLog:commit()
+	file = io.open("./debugLog.txt", "a")
+	file:write(tostring(self.text).."\n")
+	file:close()
+	self.text = ""
+end
+
 helpers = {}
 
 function helpers.clearDebugLog()
@@ -27,11 +47,7 @@ function helpers.clearDebugLog()
 	file:close()
 end
 
-function helpers.debugLog(text)
-	file = io.open("./debugLog.txt", "a")
-	file:write(tostring(text).."\n")
-	file:close()
-end
+
 
 --Using an index is slower in tables less than 10000 items in size.
 function helpers.keys(tblin)

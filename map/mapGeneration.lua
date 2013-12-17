@@ -36,7 +36,7 @@ function mapGeneration.generate(level)
 		--mapGeneration.configureScript(scripts.modify.script,"modify","terrain",level)
 		mapGeneration.runScript(scripts.modify.script,level.terrain.map)
 	end
-	io.output("./mapoutput.grid", "w")
+	io.output("./maps/mapoutput"..tostring(level.id)..".grid", "w")
 	level.terrain.map:printReadableMap(" ")
 	io.close()
 end
@@ -65,17 +65,17 @@ function mapGeneration.configureScript(script,scriptType,layer,level)
 		elseif(script.constraint[parameter].none) then
 			level[layer].scripts[scriptType][script.id][parameter] = script[parameter]
 		end
-		-- --Print Parameters DEBUG
-		-- if(type(level[layer].scripts[scriptType][script.id][parameter]) == "table") then
-			-- print(parameter..":")
-			-- for k,v in pairs(level[layer].scripts[scriptType][script.id][parameter]) do
-				-- print(k,v)
-			-- end
-		-- else
-			-- print(parameter, level[layer].scripts[scriptType][script.id][parameter])
-		-- end
+		--Print Parameters DEBUG
+		if(type(level[layer].scripts[scriptType][script.id][parameter]) == "table") then
+			debugLog:append(parameter..":")
+			for k,v in pairs(level[layer].scripts[scriptType][script.id][parameter]) do
+				debugLog:append("  "..tostring(k)..": "..tostring(v))
+			end
+		else
+			debugLog:append(tostring(parameter)..": "..tostring(level[layer].scripts[scriptType][script.id][parameter]))
+		end
 	end
-	-- print("Depend:")
+	debugLog:append("Depend:")
 	--Depend Constraints
 	constraint = level.lcgrandom:int32()
 	script.constraint.depend(constraint)
@@ -83,14 +83,14 @@ function mapGeneration.configureScript(script,scriptType,layer,level)
 	for _,parameter in pairs(dependList) do
 		level[layer].scripts[scriptType][script.id][parameter] = script[parameter]
 		--Print Depend Parameters DEBUG
-		-- if(type(level[layer].scripts[scriptType][script.id][parameter]) == "table") then
-			-- print(parameter..":")
-			-- for k,v in pairs(level[layer].scripts[scriptType][script.id][parameter]) do
-				-- print(k,v)
-			-- end
-		-- else
-			-- print(parameter, level[layer].scripts[scriptType][script.id][parameter])
-		-- end
+		if(type(level[layer].scripts[scriptType][script.id][parameter]) == "table") then
+			debugLog:append(parameter..":")
+			for k,v in pairs(level[layer].scripts[scriptType][script.id][parameter]) do
+				debugLog:append("  "..tostring(k)..": "..tostring(v))
+			end
+		else
+			debugLog:append(tostring(parameter)..": "..tostring(level[layer].scripts[scriptType][script.id][parameter]))
+		end
 	end
 end
 

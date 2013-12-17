@@ -5,7 +5,7 @@ require("world")
 require("camera")
 require("lcgrandom")
 
-helpers.clearDebugLog()
+debugLog:clear()
 
 dev = {}
 dev.cameraSpeed = 8
@@ -28,11 +28,13 @@ end
 
 function love.keypressed(key)
 	activeKeys[key] = true
+	world.sendInput("characters", 1, activeKeys)
 end
 
 function love.keyreleased(key)
 	activeKeys[key] = nil
 	inputLock:unlock(key)
+	world.sendInput("characters", 1, activeKeys)
 end
 
 canvas = {}
@@ -45,41 +47,35 @@ function love.load()
 	canvas.primary = love.graphics.newCanvas()
 	--One: 1386895053
 	--seed = 1387229252
-	world.initialize{camera = camera, drawingCanvas = canvas.diffuse}
+	world.initialize{camera = camera, drawingCanvas = canvas.diffuse, seed = 1387294098}
 	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "generatelevels"}
 	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = 1}
+	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "createcharacter", id = 1}
+	world.processEventQueue()
 end
 
 function love.update(dt)
+	--Process input before processing event queue.
 	love.event.pump()
 	if(activeKeys.escape) then
 		love.event.quit()
 	end
-	if(activeKeys.up) then
-		camera.move(0,-dev.cameraSpeed)
-	end
-	if(activeKeys.down) then
-		camera.move(0,dev.cameraSpeed)
-	end
-	if(activeKeys.left) then
-		camera.move(-dev.cameraSpeed,0)
-	end
-	if(activeKeys.right) then
-		camera.move(dev.cameraSpeed,0)
-	end
 	if(activeKeys.n) then
 		if(inputLock:lock("n")) then
-			level = helpers.clamp((level + 1), 1, #world.levels)
-			world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = helpers.clamp((world.currentLevel + 1),1,#world.currentLevel)}
+			--level = helpers.clamp((level + 1), 1, #world.levels)
+			world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = helpers.clamp((world.currentLevel + 1),1,#world.levels)}
 		end
 	end
 	if(activeKeys.p) then
 		if(inputLock:lock("p")) then
-			level = helpers.clamp((level - 1), 1, #world.levels)
-			world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = helpers.clamp((world.currentLevel - 1),1,#world.currentLevel)}
+			--level = helpers.clamp((level - 1), 1, #world.levels)
+			world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = helpers.clamp((world.currentLevel - 1),1,#world.levels)}
 		end
 	end
+	world.fillEventQueue()
 	world.processEventQueue()
+	world.processMovement()
+	debugLog:commit()
 end
 
 timeStart = 0
@@ -87,6 +83,7 @@ timeStart = 0
 --Draw scene
 function love.draw()
 	--timeStart = love.timer.getTime()
+	world.configureCamera()
 	love.graphics.translate(camera.getNegativePosition())
 	love.graphics.setCanvas(canvas.diffuse)
 	
@@ -158,6 +155,93 @@ function love.run()
         end
 
         if love.timer then love.timer.sleep(0.001) end
+    end
+
+end
+
+local function error_printer(msg, layer)
+    print((debug.traceback("Error: " .. tostring(msg), 1+(layer or 1)):gsub("\n[^\n]+$", "")))
+end
+
+function love.errhand(msg)
+	debugLog:commit()
+	
+    msg = tostring(msg)
+
+    error_printer(msg, 2)
+
+    if not love.window or not love.graphics or not love.event then
+        return
+    end
+
+    if not love.graphics.isCreated() or not love.window.isCreated() then
+        if not pcall(love.window.setMode, 800, 600) then
+            return
+        end
+    end
+
+    -- Reset state.
+    if love.mouse then
+        love.mouse.setVisible(true)
+        love.mouse.setGrabbed(false)
+    end
+    if love.joystick then
+        for i,v in ipairs(love.joystick.getJoysticks()) do
+            v:setVibration() -- Stop all joystick vibrations.
+        end
+    end
+    if love.audio then love.audio.stop() end
+    love.graphics.reset()
+    love.graphics.setBackgroundColor(89, 157, 220)
+    local font = love.graphics.setNewFont(14)
+
+    love.graphics.setColor(255, 255, 255, 255)
+
+    local trace = debug.traceback()
+
+    love.graphics.clear()
+    love.graphics.origin()
+
+    local err = {}
+
+    table.insert(err, "Error\n")
+    table.insert(err, msg.."\n\n")
+
+    for l in string.gmatch(trace, "(.-)\n") do
+        if not string.match(l, "boot.lua") then
+            l = string.gsub(l, "stack traceback:", "Traceback\n")
+            table.insert(err, l)
+        end
+    end
+
+    local p = table.concat(err, "\n")
+
+    p = string.gsub(p, "\t", "")
+    p = string.gsub(p, "%[string \"(.-)\"%]", "%1")
+
+    local function draw()
+        love.graphics.clear()
+        love.graphics.printf(p, 70, 70, love.graphics.getWidth() - 70)
+        love.graphics.present()
+    end
+
+    while true do
+        love.event.pump()
+
+        for e, a, b, c in love.event.poll() do
+            if e == "quit" then
+                return
+            end
+            if e == "keypressed" and a == "escape" then
+                return
+            end
+        end
+
+        draw()
+
+        if love.timer then
+            love.timer.sleep(0.1)
+        end
     end
 
 end

@@ -20,7 +20,7 @@ This is extremely important. Here, you will declare which scripts are to follow 
 This is an inclusive feature, which means only listed scripts will be used.
 You can decalare scripts via constraints such as select, multiselect, or procedure.
 ]]--
-nonLinearTunnel.modify = {2,2,1}
+nonLinearTunnel.modify = {2,2,3,1}
 
 --Configuration Parameters
 nonLinearTunnel.seed = 0
@@ -49,12 +49,12 @@ nonLinearTunnel.constraint.tileImageName.none = true
 nonLinearTunnel.constraint.modify.none = true
 nonLinearTunnel.constraint.seed.seed = true
 nonLinearTunnel.constraint.decay.range = {125,225}
-nonLinearTunnel.constraint.searchDistance.range = {5,17}
+nonLinearTunnel.constraint.searchDistance.range = {7,17}
 nonLinearTunnel.constraint.shortCircuit.depend = true
 nonLinearTunnel.constraint.edgeBuffer.procedure = function (seed)
 	local lcgrandomLocal = lcgrandom:new()
 	lcgrandomLocal:seed(seed)
-	nonLinearTunnel.edgeBuffer = helpers.clamp(helpers.round(weighting.oddExp(lcgrandomLocal:float(),5,2,0.5,-2,0)),0,2)
+	nonLinearTunnel.edgeBuffer = (helpers.clamp(helpers.round(weighting.oddExp(lcgrandomLocal:float(),5,2,0.5,-2,0)),0,2) + 1)
 end
 nonLinearTunnel.constraint.searchShape.select = {"square","square","diamond","diamond","column"}
 nonLinearTunnel.constraint.relativeWeights.select = {true,true,true,true,false,false}

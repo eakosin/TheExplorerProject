@@ -4,13 +4,21 @@ require("map/mapGeneration")
 require("lcgrandom")
 
 level = {terrain = {}, decorate = {}, dynamic = {}}
+level.world = {}
+level.id = 0
+level.name = "Level 0"
 level.tileSize = {x = 32, y = 32}
 level.seed = 0
 
-function level:new(new)
-	new = new or {}
+function level:new(world)
+	new = {}
 	setmetatable(new, self)
 	self.__index = self
+	new.world = world
+	new.terrain = {}
+	new.decorate = {}
+	new.dynamic = {}
+	new.tileSize = {x = 32, y = 32}
 	new.lcgrandom = lcgrandom:new()
 	return new
 end
@@ -82,6 +90,28 @@ function level:prepareSpriteBatches()
 		end
 	end
 	self.terrain.spriteBatch:unbind()
+end
+
+function level:fillEventQueue()
+	
+end
+
+function level:processEvent(event)
+	if(event.name == "collision") then
+		debugLog:append(tostring(helpers.int((event.x + 32) / 32))..","..tostring(helpers.int(((event.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.x / 32) + 32)][helpers.int((event.y / 32))]))
+		if(self.terrain.map.grid[helpers.int((event.x + 32) / 32)][helpers.int(((event.y + event.dn + 32) / 32))] == self.terrain.map.tileset.wall) then
+			event.object.canMove.north = false
+		end
+		if(self.terrain.map.grid[helpers.int((event.x + 32) / 32)][helpers.int(((event.y + event.ds + 32) / 32))] == self.terrain.map.tileset.wall) then
+			event.object.canMove.south = false
+		end
+		if(self.terrain.map.grid[helpers.int((event.x + event.dw + 32) / 32)][helpers.int(((event.y + 32) / 32))] == self.terrain.map.tileset.wall) then
+			event.object.canMove.west = false
+		end
+		if(self.terrain.map.grid[helpers.int((event.x + event.de + 32) / 32)][helpers.int(((event.y + 32) / 32))] == self.terrain.map.tileset.wall) then
+			event.object.canMove.east = false
+		end
+	end
 end
 
 function level:draw()

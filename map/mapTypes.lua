@@ -10,13 +10,8 @@ function map:new(new)
 	new = new or {}
 	setmetatable(new, self)
 	self.__index = self
-	self.grid = {}
+	new.grid = {}
 	return new
-end
-
-function map:duplicate()
-	local mapdupe = self
-	return mapdupe
 end
 
 function map:buildMap(inwidth, inheight)
