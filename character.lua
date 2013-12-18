@@ -9,6 +9,7 @@ character.imageName = "crapcharacter.png"
 character.x, character.y = 0,0
 character.dn, character.ds, character.dw, character.de = 0,0,0,0
 character.canMove = {north = true, south = true, west = true, east = true}
+character.stats = {health = 100, energy = 50, weapon = 5, armor = 5, status = {}} 
 
 function character:new(world)
 	new = {}
@@ -16,6 +17,7 @@ function character:new(world)
 	self.__index = self
 	new.world = world
 	new.canMove = {north = true, south = true, west = true, east = true}
+	new.stats = {health = 100, energy = 50, weapon = 5, armor = 5, status = {}} 
 	return new
 end
 

@@ -7,9 +7,6 @@ require("lcgrandom")
 
 debugLog:clear()
 
-dev = {}
-dev.cameraSpeed = 8
-
 activeKeys = {}
 
 inputLock = {}
@@ -47,7 +44,8 @@ function love.load()
 	canvas.primary = love.graphics.newCanvas()
 	--One: 1386895053
 	--seed = 1387229252
-	world.initialize{camera = camera, drawingCanvas = canvas.diffuse, seed = 1387294098}
+	--seed = 1387294098
+	world.initialize{camera = camera, drawingCanvas = canvas.diffuse, seed = 1387333543}
 	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "generatelevels"}
 	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = 1}
 	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "createcharacter", id = 1}
@@ -99,7 +97,7 @@ end
 
 --Quitting
 function love.quit()
-	
+	debugLog:commit()
 end
 
 --The main loop

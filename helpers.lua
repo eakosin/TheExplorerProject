@@ -33,10 +33,12 @@ function debugLog:append(text)
 end
 
 function debugLog:commit()
-	file = io.open("./debugLog.txt", "a")
-	file:write(tostring(self.text).."\n")
-	file:close()
-	self.text = ""
+	if(self.text ~= "") then
+		file = io.open("./debugLog.txt", "a")
+		file:write(tostring(self.text).."\n")
+		file:close()
+		self.text = ""
+	end
 end
 
 helpers = {}

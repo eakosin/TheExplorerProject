@@ -1,11 +1,11 @@
-Written for Love 0.9.0 nightly.
-To be packaged with 0.9.0 once both are completed completed.
+Written for Love 0.9.0.
+To be packaged with 0.9.0 once completed.
 
 Instructions to run:
 
-Download Love nightly -> http://nightly.projecthawkthorne.com/
+Download Love -> http://love2d.org/
 
-Extract Love nightly archive.
+Extract Love archive.
 
 Copy game folder into extracted archive.
 
