@@ -44,7 +44,7 @@ function map:printMap(spacer)
 end
 
 function map:printReadableMap(spacer)
-	local conversion = {'.','+','#','~'}
+	local conversion = {'.','+','#','~',[128] = '^',[129]= '/'}
 	for y=1,self.height do
 		for x=1,self.width do
 			io.write(conversion[self.grid[x][y]]..spacer)

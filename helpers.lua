@@ -28,8 +28,10 @@ function debugLog:clear()
 	file:close()
 end
 
-function debugLog:append(text)
-	self.text = self.text..tostring(text).."\n"
+function debugLog:append(text,terminator)
+	local text = text or ""
+	local terminator = terminator or "\n"
+	self.text = self.text..tostring(text)..tostring(terminator)
 end
 
 function debugLog:commit()
@@ -54,7 +56,6 @@ end
 --Using an index is slower in tables less than 10000 items in size.
 function helpers.keys(tblin)
 	local keys = {}
-	local tbliter = tablin
 	for key, value in pairs(tblin) do
 		keys[#keys+1] = key
 	end

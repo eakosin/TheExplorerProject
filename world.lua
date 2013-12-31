@@ -7,20 +7,25 @@ require("map/mapGeneration")
 require("level")
 require("character")
 require("enemy")
+require("projectiles")
 
 world.lcgrandom = lcgrandom:new()
 world.camera = nil
 world.levelChange = false
+world.loading = false
 
 world.levels = {}
 world.characters = {}
 world.enemies = {}
-world.eventQueue = {level = {}, character = {}, enemy = {}, world = {}}
+world.projectiles = {}
+world.eventQueue = {level = {}, character = {}, enemy = {}, world = {}, projectile = {}}
 
 world.currentLevel = 0
 
 function world.fillEventQueue()
-	world.levels[world.currentLevel]:fillEventQueue()
+	if(world.levels[world.currentLevel]) then
+		world.levels[world.currentLevel]:fillEventQueue()
+	end
 	for id = 1, #world.characters do
 		world.characters[id]:fillEventQueue()
 	end
@@ -33,21 +38,34 @@ For example: world.eventQueue.enemy[#world.eventQueue.enemy + 1] = {"all", "char
 world.eventQueue.world[id] = {eventParameter = value, ...}
 ]]--
 function world.processEventQueue()
-	for id,event in pairs(world.eventQueue.world) do
-		print(event.name)
-		world.processWorldEvent(event)
-		world.eventQueue.world[id] = nil
+	for id = 1, #world.eventQueue.world do
+		debugLog:append(tostring(id)..": "..tostring(world.eventQueue.world[id]))
+		world.processWorldEvent(world.eventQueue.world[id])
 	end
-	for id,event in pairs(world.eventQueue.level) do
-		world.processLevelEvent(event)
-		world.eventQueue.level[id] = nil
+	world.eventQueue.world = {}
+	for id = 1, #world.eventQueue.level do
+		world.processLevelEvent(world.eventQueue.level[id])
 	end
+	world.eventQueue.level = {}
+	for id = 1, #world.eventQueue.character do
+		world.processLevelEvent(world.eventQueue.character[id])
+	end
+	world.eventQueue.character = {}
+	for id = 1, #world.eventQueue.enemy do
+		world.processLevelEvent(world.eventQueue.enemy[id])
+	end
+	world.eventQueue.enemy = {}
+	for id = 1, #world.eventQueue.projectile do
+		world.processLevelEvent(world.eventQueue.projectile[id])
+	end
+	world.eventQueue.projectile = {}
 end
 
 function world.processWorldEvent(event)
+	debugLog:append(tostring(event))
 	if(event.name == "generatelevels") then
-		for id = 1, 10 do
-			print("Level: "..tostring(id))
+		event.number = event.number or 3
+		for id = 1, event.number do
 			debugLog:append("\nLevel: "..tostring(id).." - "..tostring(world.levels[id]))
 			local timeStart = love.timer.getTime()
 			world.levels[id] = level:new(world)
@@ -61,7 +79,7 @@ function world.processWorldEvent(event)
 		debugLog:append("Memory: "..tostring(collectgarbage("count")))
 		debugLog:commit()
 		collectgarbage()
-		world.levelChange = true
+		--world.levelChange = true
 	elseif(event.name == "destroylevels") then
 		if(event.ids) then
 			for i = 1, #event.ids do
@@ -72,7 +90,7 @@ function world.processWorldEvent(event)
 		end
 		collectgarbage()
 	elseif(event.name == "changelevel") then
-		world.currentLevel = event.id
+		world.currentLevel = helpers.clamp(event.id,1,#world.levels)
 		local levelStart = world.levels[world.currentLevel].terrain.map.start
 		if(world.characters[1]) then
 			world.characters[1]:placeCharacter(((levelStart.x * 32) - 32), ((levelStart.y * 32) - 16))
@@ -92,27 +110,65 @@ end
 
 function world.processLevelEvent(event)
 	if(event.destination == "all") then
-		for id,level in pairs(world.levels) do
-			--level:processEvent()
+		for id = 1, #world.levels do
+			world.levels[id]:processEvent(event)
 		end
 	elseif(event.destination == "currentlevel") then
 		world.levels[world.currentLevel]:processEvent(event)
+	else
+		destination = 1
+		while(event[destination]) do
+			world.levels[event[destination]]:processEvent(event)
+		end
 	end
 end
 
 function world.processCharacterEvent(id, event)
-	
+	if(event.destination == "all") then
+		for id = 1, #world.characters do
+			world.characters[id]:processEvent(event)
+		end
+	elseif(event.destination == "currentlevel") then
+		world.characters[world.currentLevel]:processEvent(event)
+	else
+		destination = 1
+		while(event[destination]) do
+			world.characters[event[destination]]:processEvent(event)
+		end
+	end
 end
 
 function world.processEnemyEvent(id, event)
-	
+	if(event.destination == "all") then
+		for id = 1, #world.enemies do
+			world.enemies[id]:processEvent(event)
+		end
+	elseif(event.destination == "currentlevel") then
+		world.enemies[world.currentLevel]:processEvent(event)
+	else
+		destination = 1
+		while(event[destination]) do
+			world.enemies[event[destination]]:processEvent(event)
+		end
+	end
 end
 
-function world.sendInput(group, id, keys)
-	world[group][id]:recieveInput(keys)
+function world.processProjectileEvent(id, event)
+	if(event.destination == "all") then
+		for id = 1, #world.projectiles do
+			world.projectiles[id]:processEvent(event)
+		end
+	elseif(event.destination == "currentlevel") then
+		world.projectiles[world.currentLevel]:processEvent(event)
+	else
+		destination = 1
+		while(event[destination]) do
+			world.projectiles[event[destination]]:processEvent(event)
+		end
+	end
 end
 
-function world.processMovement()
+function world.processChanges()
 	for id = 1, #world.characters do
 		world.characters[id]:move()
 	end
@@ -135,7 +191,23 @@ function world.initialize(parameters)
 	end
 	world.seed = world.seed or os.time()
 	world.lcgrandom:seed(world.seed)
-	debugLog:append("World Seed: "..tostring(world.seed))
+	--Generate as many random numbers as possible within a 50ms period to add hardware performance
+	--to the os time for better randomization.
+	local count = 0
+	if(not world.count) then
+		local startTime = love.timer.getTime()
+		while((love.timer.getTime() - startTime) < .05) do
+			world.lcgrandom:int32()
+			count = count + 1
+		end
+	else
+		local i = 0
+		while(i < world.count) do
+			world.lcgrandom:int32()
+			i = i + 1
+		end
+	end
+	debugLog:append("World Seed: "..tostring(world.seed).." Iteration Count: "..tostring(count))
 	mapGeneration.loadScripts()
 	world.canvasDimensions = {world.drawingCanvas:getDimensions()}
 end

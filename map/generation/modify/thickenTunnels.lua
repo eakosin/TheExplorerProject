@@ -51,7 +51,7 @@ function thickenTunnels.double(inMap)
 	oldMap:buildMap(inMap.width, inMap.height)
 	oldMap.start = {x = inMap.start.x, y = inMap.start.y}
 	for x=1, inMap.width do
-		for y=1, inMap.width do
+		for y=1, inMap.height do
 			oldMap.grid[x][y] = inMap.grid[x][y]
 		end
 	end
@@ -60,7 +60,7 @@ function thickenTunnels.double(inMap)
 	inMap:buildMap((oldMap.width * 2), (oldMap.height * 2))
 	inMap.start = {x = (oldMap.start.x * 2), y = (oldMap.start.y * 2)}
 	for x=0, (oldMap.width - 1) do
-		for y=0, (oldMap.width - 1) do
+		for y=0, (oldMap.height - 1) do
 			inMap.grid[(x*2)+1][(y*2)+1] = oldMap.grid[x+1][y+1]
 			inMap.grid[(x*2)+2][(y*2)+1] = oldMap.grid[x+1][y+1]
 			inMap.grid[(x*2)+1][(y*2)+2] = oldMap.grid[x+1][y+1]

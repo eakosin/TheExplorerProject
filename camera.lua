@@ -27,10 +27,8 @@ function camera.move(x,y)
 end
 
 function camera.setPosition(x,y)
-	camera.x = x
-	camera.x = camera.bound(camera.x,0,((camera.tileBound.x*camera.tileSize.x)-camera.canvasSize.width))
-	camera.y = y
-	camera.y = camera.bound(camera.y,0,((camera.tileBound.y*camera.tileSize.y)-camera.canvasSize.height))
+	camera.x = camera.bound(x,0,((camera.tileBound.x*camera.tileSize.x)-camera.canvasSize.width))
+	camera.y = camera.bound(y,0,((camera.tileBound.y*camera.tileSize.y)-camera.canvasSize.height))
 end
 
 function camera.dx()

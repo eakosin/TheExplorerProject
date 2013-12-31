@@ -1,3 +1,4 @@
+require("menu")
 require("tiles")
 require("map/mapGeneration")
 require("helpers")
@@ -7,9 +8,11 @@ require("lcgrandom")
 
 debugLog:clear()
 
-activeKeys = {}
+keyState = {}
 
 inputLock = {}
+
+mouseState = {}
 
 function inputLock:lock(input)
 	if(self[input]) then
@@ -24,14 +27,20 @@ function inputLock:unlock(input)
 end
 
 function love.keypressed(key)
-	activeKeys[key] = true
-	world.sendInput("characters", 1, activeKeys)
+	keyState[key] = true
 end
 
 function love.keyreleased(key)
-	activeKeys[key] = nil
+	keyState[key] = nil
 	inputLock:unlock(key)
-	world.sendInput("characters", 1, activeKeys)
+end
+
+function love.mousepressed(x, y, button)
+	mouseState[button] = {x = x, y = y}
+end
+
+function love.mousereleased(x, y, button)
+	mouseState[button] = nil
 end
 
 canvas = {}
@@ -45,54 +54,96 @@ function love.load()
 	--One: 1386895053
 	--seed = 1387229252
 	--seed = 1387294098
-	world.initialize{camera = camera, drawingCanvas = canvas.diffuse, seed = 1387333543}
-	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "generatelevels"}
-	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = 1}
-	world.eventQueue.world[#world.eventQueue.world + 1] = {name = "createcharacter", id = 1}
-	world.processEventQueue()
+	world.initialize{menu = menu, camera = camera, drawingCanvas = canvas.diffuse, keyState = keyState, inputLock = inputLock, mouseState = mouseState}
+
+	menu.initialize{world = world, canvas = canvas.diffuse, keyState = keyState, inputLock = inputLock, mouseState = mouseState}
 end
 
 function love.update(dt)
 	--Process input before processing event queue.
 	love.event.pump()
-	if(activeKeys.escape) then
-		love.event.quit()
+	if(keyState.escape) then
+		menu.visible = true
+		world.loading = true
+		world.eventQueue.world[#world.eventQueue.world + 1] = {name = "destroylevels"}
 	end
-	if(activeKeys.n) then
+	if(keyState.n) then
 		if(inputLock:lock("n")) then
 			--level = helpers.clamp((level + 1), 1, #world.levels)
 			world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = helpers.clamp((world.currentLevel + 1),1,#world.levels)}
 		end
 	end
-	if(activeKeys.p) then
+	if(keyState.p) then
 		if(inputLock:lock("p")) then
 			--level = helpers.clamp((level - 1), 1, #world.levels)
 			world.eventQueue.world[#world.eventQueue.world + 1] = {name = "changelevel", id = helpers.clamp((world.currentLevel - 1),1,#world.levels)}
 		end
 	end
-	world.fillEventQueue()
-	world.processEventQueue()
-	world.processMovement()
+	if(world.loading) then
+		world.processEventQueue()
+		world.processChanges()
+		world.loading = false
+	elseif(menu.visible) then
+		menu.fillEventQueue()
+		menu.processEventQueue()
+	else
+		world.fillEventQueue()
+		world.processEventQueue()
+		world.processChanges()
+	end
 	debugLog:commit()
 end
 
 timeStart = 0
+frame = 0
 
 --Draw scene
 function love.draw()
 	--timeStart = love.timer.getTime()
-	world.configureCamera()
-	love.graphics.translate(camera.getNegativePosition())
-	love.graphics.setCanvas(canvas.diffuse)
-	
-	world.draw()
-	
-	love.graphics.setCanvas(canvas.primary)
-	love.graphics.origin()
-	love.graphics.draw(canvas.diffuse,0,0,0,2,2)
-	love.graphics.setCanvas()
-	love.graphics.draw(canvas.primary)
-	--helpers.debugLog(love.timer.getTime() - timeStart)
+	if(menu.visible) then
+		love.graphics.origin()
+		love.graphics.setCanvas(canvas.diffuse)
+		
+		love.graphics.clear()
+		
+		menu.draw()
+		
+		love.graphics.setCanvas(canvas.primary)
+		love.graphics.draw(canvas.diffuse,0,0,0,2,2)
+		love.graphics.setCanvas()
+		love.graphics.draw(canvas.primary)
+	elseif(world.loading) then
+		love.graphics.setCanvas(canvas.diffuse)
+		
+		love.graphics.setBackgroundColor(0,0,0,255)
+		love.graphics.clear()
+		
+		love.graphics.print("Loading...")
+		
+		love.graphics.setCanvas(canvas.primary)
+		love.graphics.origin()
+		love.graphics.draw(canvas.diffuse,0,0,0,2,2)
+		love.graphics.setCanvas()
+		love.graphics.draw(canvas.primary)
+	else
+		world.configureCamera()
+		love.graphics.translate(camera.getNegativePosition())
+		love.graphics.setCanvas(canvas.diffuse)
+		
+		love.graphics.setBackgroundColor(0,0,0,255)
+		love.graphics.clear()
+		
+		world.draw()
+		
+		love.graphics.setCanvas(canvas.primary)
+		love.graphics.origin()
+		love.graphics.draw(canvas.diffuse,0,0,0,2,2)
+		love.graphics.setCanvas()
+		love.graphics.draw(canvas.primary)
+	end
+	--debugLog:append(tostring(love.timer.getTime() - timeStart).." - Frame "..tostring(frame))
+	--debugLog:commit()
+	--frame = frame + 1
 end
 
 --Quitting

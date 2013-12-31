@@ -5,6 +5,7 @@ character = {}
 character.world = {}
 character.id = 0
 character.name = ""
+character.isPlayer = true
 character.imageName = "crapcharacter.png"
 character.x, character.y = 0,0
 character.dn, character.ds, character.dw, character.de = 0,0,0,0
@@ -21,7 +22,8 @@ function character:new(world)
 	return new
 end
 
-function character:initialize()
+function character:initialize(isPlayer)
+	self.isPlayer = isPlayer
 	self.image = love.graphics.newImage("images/"..self.imageName)
 end
 
@@ -30,30 +32,27 @@ function character:placeCharacter(x, y)
 	self.y = y
 end
 
-function character:recieveInput(keys)
-	if(keys.up) then
+function character:fillEventQueue()
+	if(self.world.keyState.up) then
 		self.dn = -8
 	else
 		self.dn = 0
 	end
-	if(keys.down) then
+	if(self.world.keyState.down) then
 		self.ds = 8
 	else
 		self.ds = 0
 	end
-	if(keys.left) then
+	if(self.world.keyState.left) then
 		self.dw = -8
 	else
 		self.dw = 0
 	end
-	if(keys.right) then
+	if(self.world.keyState.right) then
 		self.de = 8
 	else
 		self.de = 0
 	end
-end
-
-function character:fillEventQueue()
 	if(self.dn ~= 0 or self.ds ~= 0 or self.dw ~= 0 or self.de ~= 0) then
 		self.world.eventQueue.level[#self.world.eventQueue.level + 1] = {destination = "currentlevel",
 																		name = "collision",

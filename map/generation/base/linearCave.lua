@@ -8,7 +8,7 @@ Each script needs a unique id number.
 Generation scripts span 1000-1999
 Modify scripts span 2000-2999
 ]]--
-linearCave.id = 2
+linearCave.id = 3
 linearCave.name = "Single Path Cave 1"
 
 --Configuration Parameters

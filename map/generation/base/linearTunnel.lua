@@ -8,7 +8,7 @@ Each script needs a unique id number.
 Generation scripts span 1000-1999
 Modify scripts span 2000-2999
 ]]--
-linearTunnel.id = 3
+linearTunnel.id = 4
 linearTunnel.name = "Single Path Tunnel 1"
 
 --Configuration Parameters

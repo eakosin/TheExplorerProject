@@ -10,7 +10,7 @@ I almost wish for a simpler way to do this configuration stuff,
 but this way, it can be flexible or minutely controlled.
 Documentation to come...
 ]]--
-nonLinearTunnel.id = 4
+nonLinearTunnel.id = 2
 nonLinearTunnel.name = "Branching Tunnel 1"
 nonLinearTunnel.tileImageName = "craptileset.png"
 
@@ -21,6 +21,7 @@ This is an inclusive feature, which means only listed scripts will be used.
 You can decalare scripts via constraints such as select, multiselect, or procedure.
 ]]--
 nonLinearTunnel.modify = {2,2,3,1}
+nonLinearTunnel.decorate = {1,2}
 
 --Configuration Parameters
 nonLinearTunnel.seed = 0
@@ -47,6 +48,7 @@ nonLinearTunnel.constraint.id.none = true
 nonLinearTunnel.constraint.name.none = true
 nonLinearTunnel.constraint.tileImageName.none = true
 nonLinearTunnel.constraint.modify.none = true
+nonLinearTunnel.constraint.decorate.none = true
 nonLinearTunnel.constraint.seed.seed = true
 nonLinearTunnel.constraint.decay.range = {125,225}
 nonLinearTunnel.constraint.searchDistance.range = {5,17}
