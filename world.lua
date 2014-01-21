@@ -170,7 +170,7 @@ end
 
 function world.processChanges()
 	for id = 1, #world.characters do
-		world.characters[id]:move()
+		world.characters[id]:processChanges()
 	end
 end
 

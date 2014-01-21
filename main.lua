@@ -59,7 +59,11 @@ function love.load()
 	menu.initialize{world = world, canvas = canvas.diffuse, keyState = keyState, inputLock = inputLock, mouseState = mouseState}
 end
 
+timeStart = 0
+frame = 0
+
 function love.update(dt)
+	timeStart = love.timer.getTime()
 	--Process input before processing event queue.
 	love.event.pump()
 	if(keyState.escape) then
@@ -93,9 +97,6 @@ function love.update(dt)
 	end
 	debugLog:commit()
 end
-
-timeStart = 0
-frame = 0
 
 --Draw scene
 function love.draw()
@@ -141,9 +142,9 @@ function love.draw()
 		love.graphics.setCanvas()
 		love.graphics.draw(canvas.primary)
 	end
-	--debugLog:append(tostring(love.timer.getTime() - timeStart).." - Frame "..tostring(frame))
-	--debugLog:commit()
-	--frame = frame + 1
+	debugLog:append(tostring(love.timer.getTime() - timeStart).." - Frame "..tostring(frame))
+	debugLog:commit()
+	frame = frame + 1
 end
 
 --Quitting

@@ -62,7 +62,7 @@ function character:fillEventQueue()
 	end
 end
 
-function character:move()
+function character:processChanges()
 	if(self.canMove.north) then
 		self.y = self.y + self.dn
 	end
