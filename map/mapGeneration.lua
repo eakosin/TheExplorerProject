@@ -43,8 +43,8 @@ function mapGeneration.generation(level)
 		-- mapGeneration.configureScript(scripts.decorate.script,"decorate","decorate",level)
 		-- mapGeneration.runScript(scripts.decorate.script,level.terrain.map)
 	-- end
-	io.output("./maps/mapoutput"..tostring(level.id)..".grid", "w")
-	level.terrain.map:printReadableMap(" ")
+	--io.output("./maps/mapoutput"..tostring(level.id)..".grid", "w")
+	--level.terrain.map:printReadableMap(" ")
 	io.close()
 end
 
@@ -57,8 +57,8 @@ function mapGeneration.decoration(level)
 		mapGeneration.configureScript(scripts.decorate.script,"decorate","decorate",level)
 		mapGeneration.runScript(scripts.decorate.script,level.terrain.map,level.decorate.map)
 	end
-	io.output("./maps/mapoutput"..tostring(level.id).."d.grid", "w")
-	level.decorate.map:printReadableMap(" ")
+	--io.output("./maps/mapoutput"..tostring(level.id).."d.grid", "w")
+	--level.decorate.map:printReadableMap(" ")
 	io.close()
 end
 
