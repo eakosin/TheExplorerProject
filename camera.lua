@@ -10,7 +10,7 @@ camera.tileSize = {x = 32, y = 32}
 camera.canvasSize = {width = 800, height = 600}
 
 --[[
-camera.configureBoundries(tileBoundX, tileBoundY, tileSizeX, tileSizeY, canvasWidth, canvasHeight)
+camera.configureBoundries()
 This function configures the boundaries at which the camera can move.
 ]]--
 --param: tileBoundX
@@ -27,7 +27,7 @@ function camera.configureBoundries(tileBoundX, tileBoundY, tileSizeX, tileSizeY,
 end
 
 --[[
-camera.bound(value,lower,upper)
+camera.bound()
 This function checks to see if the value is within the camera range.  It returns a the boundary
 value that is within the boundary if the 'value' parameter is outside of it and the parameter itself
 if it is within it.
@@ -41,7 +41,7 @@ function camera.bound(value,lower,upper)
 end
 
 --[[
-camera.move(x,y)
+camera.move()
 This function moves the camera by the ammount passed in as the parameters.  If that moves the
 camera outside of the boundaries then the boundary is set as the new coordinate.
 ]]--
@@ -56,7 +56,7 @@ function camera.move(x,y)
 end
 
 --[[
-camera.setPosition(x,y)
+camera.setPosition()
 This function sets the new camera position to the values passed in as x and y parameters
 ]]--
 --param: x - the new x position
