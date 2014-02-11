@@ -22,6 +22,12 @@ world.eventQueue = {level = {}, character = {}, enemy = {}, world = {}, projecti
 
 world.currentLevel = 0
 
+--[[
+world.fillEventQueue:
+Call fillEventQueue in every object in the world
+]]--
+--param: none
+--return: none
 function world.fillEventQueue()
 	if(world.levels[world.currentLevel]) then
 		world.levels[world.currentLevel]:fillEventQueue()
@@ -37,6 +43,13 @@ world.eventQueue.(level|character|enemy)[id] = {(eventDestination|all), [eventDe
 For example: world.eventQueue.enemy[#world.eventQueue.enemy + 1] = {"all", "character1", name = "collision", x = chraracter.x, y = character.y}
 world.eventQueue.world[id] = {eventParameter = value, ...}
 ]]--
+
+--[[
+world.processEventQueue:
+Send each event in all queues to processing functions for that queue type.
+--]]
+--param: none
+--return: none
 function world.processEventQueue()
 	for id = 1, #world.eventQueue.world do
 		debugLog:append(tostring(id)..": "..tostring(world.eventQueue.world[id]))
@@ -61,6 +74,12 @@ function world.processEventQueue()
 	world.eventQueue.projectile = {}
 end
 
+--[[
+world.processWorldEvent:
+Process global events in the world queue
+]]--
+--param: event - event table containing all the event information
+--return: none
 function world.processWorldEvent(event)
 	debugLog:append(tostring(event))
 	if(event.name == "generatelevels") then
@@ -108,6 +127,12 @@ function world.processWorldEvent(event)
 	end
 end
 
+--[[
+world.processLevelEvent:
+Process level events in the level queue and send to the requested levels
+]]--
+--param: event - event table containing all the event information
+--return: none
 function world.processLevelEvent(event)
 	if(event.destination == "all") then
 		for id = 1, #world.levels do
@@ -119,65 +144,99 @@ function world.processLevelEvent(event)
 		destination = 1
 		while(event[destination]) do
 			world.levels[event[destination]]:processEvent(event)
+			destination = destination + 1
 		end
 	end
 end
 
+--[[
+world.processCharacterEvent:
+Process character events in the character queue and send to the requested characters
+]]--
+--param: event - event table containing all the event information
+--return: none
 function world.processCharacterEvent(id, event)
 	if(event.destination == "all") then
 		for id = 1, #world.characters do
 			world.characters[id]:processEvent(event)
 		end
-	elseif(event.destination == "currentlevel") then
-		world.characters[world.currentLevel]:processEvent(event)
 	else
 		destination = 1
 		while(event[destination]) do
 			world.characters[event[destination]]:processEvent(event)
+			destination = destination + 1
 		end
 	end
 end
 
+--[[
+world.processEnemyEvent:
+Process enemy events in the enemy queue and send to the requested enemies
+]]--
+--param: event - event table containing all the event information
+--return: none
 function world.processEnemyEvent(id, event)
 	if(event.destination == "all") then
 		for id = 1, #world.enemies do
 			world.enemies[id]:processEvent(event)
 		end
-	elseif(event.destination == "currentlevel") then
-		world.enemies[world.currentLevel]:processEvent(event)
 	else
 		destination = 1
 		while(event[destination]) do
 			world.enemies[event[destination]]:processEvent(event)
+			destination = destination + 1
 		end
 	end
 end
 
+--[[
+world.processProjectileEvent:
+Process projectile events in the projectile queue and send to the requested projectiles
+]]--
+--param: event - event table containing all the event information
+--return: none
 function world.processProjectileEvent(id, event)
 	if(event.destination == "all") then
 		for id = 1, #world.projectiles do
 			world.projectiles[id]:processEvent(event)
 		end
-	elseif(event.destination == "currentlevel") then
-		world.projectiles[world.currentLevel]:processEvent(event)
 	else
 		destination = 1
 		while(event[destination]) do
 			world.projectiles[event[destination]]:processEvent(event)
+			destination = destination + 1
 		end
 	end
 end
 
+--[[
+world.processChanges:
+Call processChanges in every existing object in world
+]]--
+--param: none
+--return: none
 function world.processChanges()
 	for id = 1, #world.characters do
 		world.characters[id]:processChanges()
 	end
 end
 
+--[[
+world.configureCamera:
+Center camera position on the characters current location
+]]--
+--param: none
+--return: none
 function world.configureCamera()
 	world.camera.setPosition((world.characters[1].x - (world.canvasDimensions[1] / 2)), (world.characters[1].y - (world.canvasDimensions[2] / 2)))
 end
 
+--[[
+world.draw:
+Call draw in every existing object in world and the currentLevel
+]]--
+--param: none
+--return: none
 function world.draw()
 	world.levels[world.currentLevel]:draw()
 	for id = 1, #world.characters do
@@ -185,6 +244,13 @@ function world.draw()
 	end
 end
 
+--[[
+world.initialize:
+Prepare the world object by adding parameters to the table, setting the random seed and
+start point, loading map generation scripts, and configuring the rendering surface
+]]--
+--param: A table of key = value parameters to be added to the world table 
+--return: none
 function world.initialize(parameters)
 	for key,value in pairs(parameters) do
 		world[key] = value
