@@ -1,10 +1,3 @@
---[[
-love.conf(t)
-This function takes one argument: a table filled with all the default values you can set and
-change configuration options.
-]]--
---param: t
---return: none
 function love.conf(t)
     t.identity = nil                   -- The name of the save directory (string)
     t.version = "0.9.0"                -- The LÖVE version this game was made for (string)
