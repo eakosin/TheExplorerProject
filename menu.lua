@@ -54,17 +54,15 @@ function menu.initialize(parameters)
 	
 	menu.screen.main.buttons = {}
 	menu.screen.main.buttons.quit = button:new()
-	menu.screen.main.buttons.quit:configure{backImageName = "crapbuttonback.png", x = 362, y = 325, text = "Quit", width = 76, height = 50, textOffset = 20}
-	--menu.screen.main.background = love.graphics.newImage("images/crapbackground.png")
+	menu.screen.main.buttons.quit:configure{backImageName = "crapbuttonback.png", x = menu.canvas:getWidth() / 2 - (76 / 2), y = 325, text = "Quit", width = 76, height = 50, textOffset = 20}
 	menu.screen.main.buttons.start = button:new()
-	menu.screen.main.buttons.start:configure{backImageName = "crapbuttonback.png", x = 362, y = 125, text = "Start", width = 76, height = 50, textOffset = 15}
+	menu.screen.main.buttons.start:configure{backImageName = "crapbuttonback.png", x = menu.canvas:getWidth() / 2 - (76 / 2), y = 125, text = "Start", width = 76, height = 50, textOffset = 15}
 	menu.screen.main.background = love.graphics.newImage("images/crapbackground.png")
+	menu.screen.main.background:setFilter("linear", "linear")
 end
 
 menu.screen.main.draw = function ()
-	love.graphics.draw(menu.screen.main.background, 0, 0, 0, 1, 1)
-	love.graphics.printf("You, and others around you are 'immigrants' to this city who were searching for a better life for your family after leaving the villages. This is the only job opportunity available and it barely provides enough for food and dwelling costs. This is similar to coal miners who have this as their only available job opportunity, and risk life and limb to support their family.", 5, 5, 600, 'left')
-	love.graphics.printf("Your character's job is to test and report on randomly generated worlds to help find and refine bugs in the generational algorithms. This involves fighting your way through the monsters inhabiting each world and exploring to find as much loot as possible to improve your pay commission style.", 5, 150, 325, 'left')
+	love.graphics.draw(menu.screen.main.background, 0, 0, 0, (menu.canvas:getWidth() / menu.screen.main.background:getWidth()), (menu.canvas:getWidth() / menu.screen.main.background:getWidth()))
 	for _,button in pairs(menu.screen.main.buttons) do
 		button:draw()
 	end

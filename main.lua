@@ -51,6 +51,17 @@ function love.load()
 	canvas.diffuse = love.graphics.newCanvas(screenWidth / 2, screenHeight / 2)
 	love.graphics.setDefaultFilter("linear", "linear", 8)
 	canvas.primary = love.graphics.newCanvas()
+	love.graphics.setCanvas(canvas.diffuse)
+	love.graphics.setBackgroundColor(0,0,0,255)
+	love.graphics.clear()
+	love.graphics.printf("You, and others around you are 'immigrants' to this city who were searching for a better life for your family after leaving the villages. This is the only job opportunity available and it barely provides enough for food and dwelling costs. This is similar to coal miners who have this as their only available job opportunity, and risk life and limb to support their family. \n\n\nYour character's job is to test and report on randomly generated worlds to help find and refine bugs in the generational algorithms. This involves fighting your way through the monsters inhabiting each world and exploring to find as much loot as possible to improve your pay commission style.\n\n\nClick to continue...", screenWidth / 32, screenHeight / 16, screenWidth / 3, 'left')
+	love.graphics.setCanvas(canvas.primary)
+	love.graphics.origin()
+	love.graphics.draw(canvas.diffuse,0,0,0,2,2)
+	love.graphics.setCanvas()
+	love.graphics.draw(canvas.primary)
+	love.graphics.present()
+	while(not (love.mouse.isDown("l") or love.mouse.isDown("r"))) do love.event.pump() end
 	--One: 1386895053
 	--seed = 1387229252
 	--seed = 1387294098
