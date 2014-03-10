@@ -37,15 +37,22 @@ end
 
 
 function enemy:fillEventQueue()
+	if(self.dx ~= 0 or self.dy ~= 0) then
+		self.world.eventQueue.level[#self.world.eventQueue.level + 1] = {destination = "currentlevel",
+																		name = "collision",
+																		object = self}
+	end
 
+--publish update event to AI object
+end
+
+
+function enemy:processEvent()
 
 end
 
 
-
-
 function enemy:processChanges()
-
 
 
 end
