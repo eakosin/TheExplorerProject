@@ -56,9 +56,7 @@ function character:fillEventQueue()
 	if(self.dn ~= 0 or self.ds ~= 0 or self.dw ~= 0 or self.de ~= 0) then
 		self.world.eventQueue.level[#self.world.eventQueue.level + 1] = {destination = "currentlevel",
 																		name = "collision",
-																		object = self,
-																		x = self.x, y = self.y,
-																		ds = self.ds, dn = self.dn, dw = self.dw, de = self.de}
+																		object = self}
 	end
 end
 

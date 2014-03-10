@@ -32,7 +32,7 @@ function menu.processEventQueue()
 					(event.x < button.x + button.width) and
 					(button.y < event.y) and
 					(event.y < button.y + button.height)) then
-					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "generatelevels"}
+					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "generatelevels", number = 1}
 					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "changelevel", id = 1}
 					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "createcharacter", id = 1}
 					debugLog:append("menu "..tostring(menu.world.eventQueue.world[1]))

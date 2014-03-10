@@ -90,7 +90,7 @@ function world.processWorldEvent(event)
 			world.levels[id] = level:new(world)
 			world.levels[id].id = id
 			world.levels[id].name = "Level "..id
-			world.levels[id]:generate(world.lcgrandom:int32())
+			world.levels[id]:initialize(world.lcgrandom:int32())
 			world.levels[id]:prepareSpriteBatches()
 			debugLog:append("Time: "..tostring(love.timer.getTime() - timeStart).." sec")
 			--world.levels[id]:clearParameters()

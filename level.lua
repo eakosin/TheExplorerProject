@@ -23,7 +23,7 @@ function level:new(world)
 	return new
 end
 
-function level:generate(seed)
+function level:initialize(seed)
 	self.seed = seed
 	self.lcgrandom:seed(self.seed)
 	--[[self.width = helpers.int(weighting.oddExp(self.lcgrandom:float(),3,100,.6,-74,10))
@@ -129,29 +129,17 @@ end
 function level:processEvent(event)
 	if(event.name == "collision") then
 		--debugLog:append(tostring(helpers.int((event.x + 32) / 32))..","..tostring(helpers.int(((event.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.x / 32) + 32)][helpers.int((event.y / 32))]))
-		if(self.terrain.map.grid[helpers.int((event.x + 24) / 32)][helpers.int(((event.y + event.dn + 24) / 32))] == self.terrain.map.tileset.wall) then
+		if(self.terrain.map.grid[helpers.int((event.object.x + 24) / 32)][helpers.int(((event.object.y + event.object.dn + 24) / 32))] == self.terrain.map.tileset.wall) then
 			event.object.canMove.north = false
 		end
-		if(self.terrain.map.grid[helpers.int((event.x + 24) / 32)][helpers.int(((event.y + event.ds + 24) / 32))] == self.terrain.map.tileset.wall) then
+		if(self.terrain.map.grid[helpers.int((event.object.x + 24) / 32)][helpers.int(((event.object.y + event.object.ds + 24) / 32))] == self.terrain.map.tileset.wall) then
 			event.object.canMove.south = false
 		end
-		if(self.terrain.map.grid[helpers.int((event.x + event.dw + 24) / 32)][helpers.int(((event.y + 24) / 32))] == self.terrain.map.tileset.wall) then
+		if(self.terrain.map.grid[helpers.int((event.object.x + event.object.dw + 24) / 32)][helpers.int(((event.object.y + 24) / 32))] == self.terrain.map.tileset.wall) then
 			event.object.canMove.west = false
 		end
-		if(self.terrain.map.grid[helpers.int((event.x + event.de + 24) / 32)][helpers.int(((event.y + 24) / 32))] == self.terrain.map.tileset.wall) then
+		if(self.terrain.map.grid[helpers.int((event.object.x + event.object.de + 24) / 32)][helpers.int(((event.object.y + 24) / 32))] == self.terrain.map.tileset.wall) then
 			event.object.canMove.east = false
-		end
-		if((self.decorate.map.grid[helpers.int((event.x + event.de + 24) / 32)][helpers.int(((event.y + 24) / 32))] == self.decorate.map.tileset.stairsdown) or
-			(self.decorate.map.grid[helpers.int((event.x + 24) / 32)][helpers.int(((event.y + event.ds + 24) / 32))] == self.decorate.map.tileset.stairsdown) or
-			(self.decorate.map.grid[helpers.int((event.x + event.dw + 24) / 32)][helpers.int(((event.y + 24) / 32))] == self.decorate.map.tileset.stairsdown) or
-			(self.decorate.map.grid[helpers.int((event.x + event.de + 24) / 32)][helpers.int(((event.y + 24) / 32))] == self.decorate.map.tileset.stairsdown)) then
-			if(self.world.currentLevel == #world.levels) then
-				self.world.menu.visible = true
-				self.world.loading = true
-				self.world.eventQueue.world[#self.world.eventQueue.world + 1] = {name = "destroylevels"}
-			else
-				self.world.eventQueue.world[#self.world.eventQueue.world + 1] = {name = "changelevel", id = (self.world.currentLevel + 1)}
-			end
 		end
 	end
 end
