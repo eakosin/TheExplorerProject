@@ -5,7 +5,6 @@ enemy = {}
 enemy.world = {}
 enemy.id = 0
 enemy.name = ""
-enemy.isPlayer = true
 enemy.imageName = "crapenemy.png"
 enemy.x, enemy.y = 0,0
 enemy.dx, enemy.dy = 0,0
@@ -24,7 +23,7 @@ end
 
 
 
-function enemy:initialize(isPlayer)
+function enemy:initialize()
 	--self.image = love.graphics.newImage("images/"..self.imageName)
 end
 
@@ -39,12 +38,15 @@ end
 
 function enemy:fillEventQueue()
 
+
 end
 
 
 
 
 function enemy:processChanges()
+
+
 
 end
 
