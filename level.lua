@@ -127,8 +127,25 @@ function level:fillEventQueue()
 end
 
 function level:processEvent(event)
-	if(event.name == "collision") then
-		--debugLog:append(tostring(helpers.int((event.x + 32) / 32))..","..tostring(helpers.int(((event.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.x / 32) + 32)][helpers.int((event.y / 32))]))
+	if(event.name == "collisionplayer") then
+		--debugLog:append(tostring(helpers.int((event.object.x + 32) / 32))..","..tostring(helpers.int(((event.object.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.object.x / 32) + 32)][helpers.int((event.object.y / 32))]))
+		if(self.terrain.map.grid[helpers.int((event.object.x + 24) / 32)][helpers.int(((event.object.y + event.object.dn + 24) / 32))] == self.terrain.map.tileset.wall) then
+			event.object.canMove.north = false
+		end
+		if(self.terrain.map.grid[helpers.int((event.object.x + 24) / 32)][helpers.int(((event.object.y + event.object.ds + 24) / 32))] == self.terrain.map.tileset.wall) then
+			event.object.canMove.south = false
+		end
+		if(self.terrain.map.grid[helpers.int((event.object.x + event.object.dw + 24) / 32)][helpers.int(((event.object.y + 24) / 32))] == self.terrain.map.tileset.wall) then
+			event.object.canMove.west = false
+		end
+		if(self.terrain.map.grid[helpers.int((event.object.x + event.object.de + 24) / 32)][helpers.int(((event.object.y + 24) / 32))] == self.terrain.map.tileset.wall) then
+			event.object.canMove.east = false
+		end
+	end
+	--Generic bounding box based collision checking.
+	--Use object.x, object.y and (object.x + object.image.getWidth()) and (object.y + object.image.getHeight()) to find the bounding box.
+	elseif(event.name == "collision") then
+		--debugLog:append(tostring(helpers.int((event.object.x + 32) / 32))..","..tostring(helpers.int(((event.object.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.object.x / 32) + 32)][helpers.int((event.object.y / 32))]))
 		if(self.terrain.map.grid[helpers.int((event.object.x + 24) / 32)][helpers.int(((event.object.y + event.object.dn + 24) / 32))] == self.terrain.map.tileset.wall) then
 			event.object.canMove.north = false
 		end
