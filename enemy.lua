@@ -12,6 +12,12 @@ enemy.canMove = true
 enemy.stats = {health = 100, energy = 50, damage = 5, defense = 5, status = {}}
 
 
+--[[
+enemy:new(world)
+This function pass the world object.
+]]--
+--param: world
+--return: new
 function enemy:new(world)
 	new = {}
 	setmetatable(new, self)
@@ -22,20 +28,36 @@ function enemy:new(world)
 end
 
 
-
+--[[
+enemy:initialize()
+This function initialize the enemy.
+]]--
+--param: none
+--return: none
 function enemy:initialize()
 	--self.image = love.graphics.newImage("images/"..self.imageName)
 end
 
 
-
+--[[
+enemy:placeEnemy(x, y)
+This function places enemy on the grid.
+]]--
+--param: x
+--param: y
+--return: none
 function enemy:placeEnemy(x, y)
 	self.x = x
 	self.y = y
 end
 
 
-
+--[[
+enemy:fillEventQueue()
+This function calls fillEventQueue in every object in enemy.
+]]--
+--param: none
+--return: none
 function enemy:fillEventQueue()
 	if(self.dx ~= 0 or self.dy ~= 0) then
 		self.world.eventQueue.level[#self.world.eventQueue.level + 1] = {destination = "currentlevel",
@@ -52,6 +74,13 @@ function enemy:processEvent()
 end
 
 
+
+--[[
+enemy:processChanges()
+This function call processChanges in every existing object in enemy.
+]]--
+--param: none
+--return: none
 function enemy:processChanges()
 
 
@@ -59,7 +88,12 @@ end
 
 
 
-
+--[[
+enemy.draw()
+Call draw in enemy to display on screen.
+]]--
+--param: none
+--return: none
 function enemy:draw()
 	love.graphics.draw( self.image, self.x, self.y, 0, 1, 1, 8, 32, 0, 0 )
 end

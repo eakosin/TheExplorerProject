@@ -58,7 +58,7 @@ end
 
 --[[
 character:fillEventQueue()
-This function...
+This function calls fillEventQueue in every object in character.
 ]]--
 --param: none
 --return: none
@@ -100,7 +100,7 @@ end
 
 --[[
 character:processChanges()
-This function
+This function call processChanges in every existing object in character.
 ]]--
 --param: none
 --return: none
@@ -124,8 +124,8 @@ function character:processChanges()
 end
 
 --[[
-character:draw()
-
+character.draw()
+Call draw in character to display on screen.
 ]]--
 --param: none
 --return: none
