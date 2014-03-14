@@ -8,12 +8,27 @@ menu.screen = {main = {}, options = {}, help = {}}
 menu.current = "main"
 menu.eventQueue = {}
 
+
+--[[
+menu.fillEventQueue()
+This function calls in every object in menu.
+]]--
+--param: none
+--return: none
 function menu.fillEventQueue()
 	if(menu.mouseState.l) then
 		menu.eventQueue[#menu.eventQueue + 1] = {name = "leftclick", x = (menu.mouseState.l.x / 2), y = (menu.mouseState.l.y / 2)}
 	end
 end
 
+
+
+--[[
+menu.processEventQueue()
+This function sends event in queues to processing functions for that queue type.
+]]--
+--param: none
+--return: none
 function menu.processEventQueue()
 	for id = 1, #menu.eventQueue do
 		event = menu.eventQueue[id]
@@ -45,13 +60,18 @@ function menu.processEventQueue()
 	menu.eventQueue = {}
 end
 
---Against the design of the rest of this codebase, the menu will be hard defined here with static names.
---Yay...
+
+--[[
+menu.initialize(parameters)
+This function initializes a menu item with its label.
+]]--
+--param: parameters
+--return: none
 function menu.initialize(parameters)
 	for key, value in pairs(parameters) do
 		menu[key] = value
 	end
-	
+
 	menu.screen.main.buttons = {}
 	menu.screen.main.buttons.quit = button:new()
 	menu.screen.main.buttons.quit:configure{backImageName = "crapbuttonback.png", x = menu.canvas:getWidth() / 2 - (76 / 2), y = 325, text = "Quit", width = 76, height = 50, textOffset = 20}
@@ -76,6 +96,13 @@ menu.screen.help.draw = function ()
 
 end
 
+
+--[[
+menu.draw()
+Call draw in menu to display on screen.
+]]--
+--param: none
+--return: none
 function menu.draw()
 	menu.screen[menu.current].draw()
 end
