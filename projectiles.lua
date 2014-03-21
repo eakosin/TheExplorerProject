@@ -40,7 +40,7 @@ function projectile:processEvent(event)
 	--change or modify projectile based off of user action and projectile calss
 end
 function projectile:processChanges()
-	if (self.canMove = false)
+	if (self.canMove == false)
 		then
 		--dissapear, destroy, sick, etc.
 	else
