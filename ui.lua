@@ -53,6 +53,7 @@ function button:draw()
 	love.graphics.draw(self.canvas, self.x, self.y)
 end
 
+progressBar = {}
 
 --[[
 progressBar:new()
