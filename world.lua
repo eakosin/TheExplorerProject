@@ -123,7 +123,7 @@ function world.processWorldEvent(event)
 		world.characters[event.id] = character:new(world)
 		character:initialize()
 		local levelStart = world.levels[world.currentLevel].terrain.map.start
-		character:placeCharacter(((levelStart.x * 32) - 32), ((levelStart.y * 32) - 16))
+		character:placeCharacter(((levelStart.x * 32) - 32), ((levelStart.y * 32) - 32))
 	end
 end
 
