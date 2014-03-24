@@ -54,9 +54,6 @@ function button:draw()
 end
 
 progressBar = {}
-
-
-progressBar = {}
 progressBar.width, progressBar.height = 0, 0
 progressBar.x, progressBar.y = 0, 0
 progressBar.text = ""
