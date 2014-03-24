@@ -8,8 +8,10 @@ character.name = ""
 character.isPlayer = true
 character.imageName = "crapcharacter.png"
 character.x, character.y = 0,0
-character.dn, character.ds, character.dw, character.de = 0,0,0,0
-character.canMove = {north = true, south = true, west = true, east = true}
+--character.dn, character.ds, character.dw, character.de = 0,0,0,0
+character.dx, character.dy = 0,0
+-- character.canMove = {north = true, south = true, west = true, east = true}
+character.canMove = {x = true, y = true}
 character.stats = {health = 100, energy = 50, weapon = 5, armor = 5, status = {}}
 
 
@@ -64,28 +66,22 @@ This function calls fillEventQueue in every object in character.
 --return: none
 function character:fillEventQueue()
 	if(self.world.keyState.up) then
-		self.dn = -8
+		self.dy = -8
+	elseif(self.world.keyState.down) then
+		self.dy = 8
 	else
-		self.dn = 0
-	end
-	if(self.world.keyState.down) then
-		self.ds = 8
-	else
-		self.ds = 0
+		self.dy = 0
 	end
 	if(self.world.keyState.left) then
-		self.dw = -8
+		self.dx = -8
+	elseif(self.world.keyState.right) then
+		self.dx = 8
 	else
-		self.dw = 0
+		self.dx = 0
 	end
-	if(self.world.keyState.right) then
-		self.de = 8
-	else
-		self.de = 0
-	end
-	if(self.dn ~= 0 or self.ds ~= 0 or self.dw ~= 0 or self.de ~= 0) then
+	if(self.dy ~= 0 or self.dx ~= 0) then
 		self.world.eventQueue.level[#self.world.eventQueue.level + 1] = {destination = "currentlevel",
-																		name = "collision",
+																		name = "collisionplayer",
 																		object = self}
 	end
 end
@@ -105,22 +101,14 @@ This function call processChanges in every existing object in character.
 --param: none
 --return: none
 function character:processChanges()
-	if(self.canMove.north) then
-		self.y = self.y + self.dn
+	if(self.canMove.x) then
+		self.x = self.x + self.dx
 	end
-	if(self.canMove.south) then
-		self.y = self.y + self.ds
+	if(self.canMove.y) then
+		self.y = self.y + self.dy
 	end
-	if(self.canMove.west) then
-		self.x = self.x + self.dw
-	end
-	if(self.canMove.east) then
-		self.x = self.x + self.de
-	end
-	self.canMove.north = true
-	self.canMove.south = true
-	self.canMove.west = true
-	self.canMove.east = true
+	self.canMove.x = true
+	self.canMove.y = true
 end
 
 --[[
@@ -130,5 +118,5 @@ Call draw in character to display on screen.
 --param: none
 --return: none
 function character:draw()
-	love.graphics.draw( self.image, self.x, self.y, 0, 1, 1, 8, 32, 0, 0 )
+	love.graphics.draw( self.image, self.x, self.y, 0, 1, 1, 0, 0, 0, 0 )
 end

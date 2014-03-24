@@ -153,8 +153,8 @@ function love.draw()
 		love.graphics.setCanvas()
 		love.graphics.draw(canvas.primary)
 	end
-	debugLog:append(tostring(love.timer.getTime() - timeStart).." - Frame "..tostring(frame))
-	debugLog:commit()
+	--debugLog:append(tostring(love.timer.getTime() - timeStart).." - Frame "..tostring(frame))
+	--debugLog:commit()
 	frame = frame + 1
 end
 
