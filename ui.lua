@@ -54,6 +54,20 @@ function button:draw()
 end
 
 
+
+progressBar = {}
+progressBar.width, progressBar.height = 0, 0
+progressBar.x, progressBar.y = 0, 0
+progressBar.text = ""
+progressBar.textOffset = 4
+progressBar.active = false
+progressBar.backImageName = ""
+progressBar.frontImageName = ""
+progressBar.verteicies = {}
+progressBar.progressBarMesh = nil
+
+
+
 --[[
 progressBar:new()
 Creates a new progresss bar if the param is nil
@@ -77,6 +91,37 @@ function progressBar:configure(parameters)
 	for key, value in pairs(parameters) do
 		self[key] = value
 	end
+
+	--configure back side of progress bar
+	self.font = love.graphics.newFont("fonts/Karla/Karla-Regular.ttf", 18)
+	self.backImage = love.graphics.newImage("images/"..self.backImageName)
+	self.backCanvas = love.graphics.newCanvas(self.width, self.height)
+	local progressBarQuad = love.graphics.newQuad(0, 0, self.width, self.height, self.backImage:getDimensions())
+	love.graphics.setCanvas(self.backCanvas)
+	love.graphics.setBackgroundColor(0,0,0,0)
+	love.graphics.clear()
+	love.graphics.draw(self.backImage, progressBarQuad)
+	love.graphics.setFont(self.font)
+	love.graphics.setColor(255, 255, 255, 255)
+	love.graphics.print(self.text, self.textOffset, ((self.height / 2) - (self.font:getHeight() / 2) - 2))
+	
+	--configure front side of progress bar
+	--self.frontCanvas = love.graphics.newCanvas(self.width, self.height)
+	--self.frontImage = love.graphics.newImage("images/"..self.frontImageName)
+	--self.progressBarMesh = love.graphics.newMesh(self.verticies, self.frontImage)
+	--love.graphics.draw(self.frontImage, progressBarMesh)
+
+	--reset global canvas
+	love.graphics.setCanvas()
+
+end
+
+function progressBar:update(parameters)
+	for key, value in pairs(parameters) do
+		self[key] = value
+	end
+	--self.progressBarMesh.setVerticies(self.verticies, self.frontImage)
+	--love.graphics.draw(self.frontImage, progressBarMesh)
 end
 
 --[[
@@ -86,6 +131,7 @@ sends the progress bar object to the love library to draw it on the screen
 --param: none
 --return: none
 function progressBar:draw()
-	love.graphics.draw(self.canvas, self.x, self.y)
+	love.graphics.draw(self.backCanvas, self.x, self.y)
 end
+
 ui = {}
