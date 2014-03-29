@@ -61,10 +61,14 @@ progressBar.textOffset = 4
 progressBar.active = false
 progressBar.backImageName = ""
 progressBar.frontImageName = ""
-progressBar.verteicies = {}
-progressBar.progressBarMesh = nil
-
-
+progressBar.vertices = { 
+	{0, 0, 0, 0, 255, 255, 255},		
+	{0, 0, 0, 0, 255, 255, 255},		
+	{0, 0, 0, 0, 255, 255, 255},		
+	{0, 0, 0, 0, 255, 255, 255},		
+	}		
+progressBar.progressBarMesh = {}
+progressBar.progressBarQuad = {}
 
 --[[
 progressBar:new()
@@ -83,31 +87,33 @@ end
 progressBar:configure()
 Builds the progress bar's properties based on the parameters passed in
 ]]--
---param: parameters - the list of values to set as the progress bar
+--param: parameters - the list of values to set as the progress bar's atributes
 --return: none
 function progressBar:configure(parameters)
 	for key, value in pairs(parameters) do
 		self[key] = value
 	end
 
+
 	--configure back side of progress bar
 	self.font = love.graphics.newFont("fonts/Karla/Karla-Regular.ttf", 18)
 	self.backImage = love.graphics.newImage("images/"..self.backImageName)
-	self.backCanvas = love.graphics.newCanvas(self.width, self.height)
-	local progressBarQuad = love.graphics.newQuad(0, 0, self.width, self.height, self.backImage:getDimensions())
-	love.graphics.setCanvas(self.backCanvas)
+	self.canvas = love.graphics.newCanvas(self.width, self.height)
+	love.graphics.setCanvas(self.canvas)
 	love.graphics.setBackgroundColor(0,0,0,0)
 	love.graphics.clear()
+	self.progressBarQuad = love.graphics.newQuad(0, 0, self.width, self.height, self.backImage:getDimensions())
 	love.graphics.draw(self.backImage, progressBarQuad)
 	love.graphics.setFont(self.font)
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.print(self.text, self.textOffset, ((self.height / 2) - (self.font:getHeight() / 2) - 2))
 	
 	--configure front side of progress bar
-	--self.frontCanvas = love.graphics.newCanvas(self.width, self.height)
-	--self.frontImage = love.graphics.newImage("images/"..self.frontImageName)
-	--self.progressBarMesh = love.graphics.newMesh(self.verticies, self.frontImage)
-	--love.graphics.draw(self.frontImage, progressBarMesh)
+	self.frontImage = love.graphics.newImage("images/crapbackground.png")
+	self.progressBarMesh = love.graphics.newMesh(self.vertices, self.frontImage, "strip")
+	self.progressBarMesh:setVertexMap(1,2,3,3,2,4)
+	love.graphics.draw(self.frontImage, progressBarMesh)
+	love.graphics.print("frontStuff", self.textOffset, ((self.height / 2) - (self.font:getHeight() / 2) - 2))
 
 	--reset global canvas
 	love.graphics.setCanvas()
@@ -115,21 +121,35 @@ function progressBar:configure(parameters)
 end
 
 function progressBar:update(parameters)
-	for key, value in pairs(parameters) do
-		self[key] = value
-	end
-	--self.progressBarMesh.setVerticies(self.verticies, self.frontImage)
-	--love.graphics.draw(self.frontImage, progressBarMesh)
+	value = parameters[value] and parameters[value] or 0
+	max = parameters[max] and parameters[max] or 1
+	fraction = value/max
+	
+	--can delete everything that is not a product of the fraction, just in there to help think about what needs to be done
+	self.vertices[1][1] = 0
+	self.vertices[1][2] = self.height
+	self.vertices[2][1] = 0
+	self.vertices[2][2] = 0
+	self.vertices[3][1] = self.width*fraction
+	self.vertices[3][2] = 0
+	self.vertices[4][1] = self.width*fraction
+	self.vertices[4][2] = 0
+	
+	self.progressBarMesh:setVertices(self.vertices, self.frontImage)
+	love.graphics.setCanvas(self.canvas)
+	love.graphics.draw(self.canvas, self.x, self.y)
+	love.graphics.setCanvas()
+
 end
 
 --[[
 progressBar:draw()
-sends the progress bar object to the love library to draw it on the screen
+sends the progress bar canvas to the love library to draw it on the screen
 ]]--
 --param: none
 --return: none
 function progressBar:draw()
-	love.graphics.draw(self.backCanvas, self.x, self.y)
+	love.graphics.draw(self.canvas, self.x, self.y)
 end
 
 ui = {}
