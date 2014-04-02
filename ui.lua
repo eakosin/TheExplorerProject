@@ -63,9 +63,9 @@ progressBar.backImageName = ""
 progressBar.frontImageName = ""
 progressBar.vertices = { 
 	{0, 0, 0, 0, 255, 255, 255},		
-	{0, 0, 0, 0, 255, 255, 255},		
-	{0, 0, 0, 0, 255, 255, 255},		
-	{0, 0, 0, 0, 255, 255, 255},		
+	{progressBar.width, 0, 0, 0, 255, 255, 255},		
+	{0, progressBar.height, 0, 0, 255, 255, 255},		
+	{progressBar.width, progressBar.height, 0, 0, 255, 255, 255},		
 	}		
 progressBar.progressBarMesh = {}
 progressBar.progressBarQuad = {}
@@ -111,8 +111,6 @@ function progressBar:configure(parameters)
 	self.frontImage = love.graphics.newImage("images/crapbackground.png")
 	self.progressBarMesh = love.graphics.newMesh(self.vertices, self.frontImage, "triangles")
 	self.progressBarMesh:setVertexMap(1,2,3,4,2,3)
-	love.graphics.draw(self.frontImage, progressBarMesh)
-	love.graphics.print("frontStuff", self.textOffset, ((self.height / 2) - (self.font:getHeight() / 2) - 2))
 	
 	--reset global canvas
 	love.graphics.setCanvas()
@@ -124,7 +122,7 @@ function progressBar:update(parameters)
 	max = parameters[max] and parameters[max] or 1
 	fraction = value/max
 	
-	self.vertices[3][1] = self.width*fraction
+	self.vertices[2][1] = self.width*fraction
 	self.vertices[4][1] = self.width*fraction
 end
 
@@ -136,4 +134,6 @@ sends the progress bar canvas to the love library to draw it on the screen
 --return: none
 function progressBar:draw()
 	love.graphics.draw(self.canvas, self.x, self.y)
+	love.graphics.draw(self.progressBarMesh, self.x, self.y)
+--	love.graphics.print("frontStuff", self.x, self.y)
 end
