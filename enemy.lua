@@ -35,7 +35,7 @@ This function initialize the enemy.
 --param: none
 --return: none
 function enemy:initialize()
-	--self.image = love.graphics.newImage("images/"..self.imageName)
+	self.image = love.graphics.newImage("images/"..self.imageName)
 end
 
 
@@ -64,12 +64,12 @@ function enemy:fillEventQueue()
 																		name = "collision",
 																		object = self}
 	end
-
+	self.world.eventQueue.ai[#self.world.eventQueue.ai + 1] = {1, name = "enemyai", object = self}
 --publish update event to AI object
 end
 
 
-function enemy:processEvent()
+function enemy:processEvent(event)
 
 end
 
@@ -95,5 +95,5 @@ Call draw in enemy to display on screen.
 --param: none
 --return: none
 function enemy:draw()
-	love.graphics.draw( self.image, self.x, self.y, 0, 1, 1, 8, 32, 0, 0 )
+	love.graphics.draw( self.image, self.x, self.y, 0, 1, 1, self.image:getWidth(), self.image:getHeight(), 0, 0 )
 end
