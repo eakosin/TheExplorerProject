@@ -47,13 +47,13 @@ function projectile:processEvent(event)
 	width = event.object.image:getWidth()
 	height = event.object.image:getHeight()
 	topLeftCorner = {x = event.object.x + event.object.dx, y = event.object.y + event.object.dy}
-	bottomRightCorner = {x = event.object.x + event.object.image:getWidth() ++ event.object.dx, 
+	bottomRightCorner = {x = event.object.x + event.object.image:getWidth() + event.object.dx,
 							y = event.object.y + event.object.image:getHeight() + event.object.dy}
-	if ((self.x >= topLeftCorner.x and self.y >= topLeftCorner.y) and 
+	if ((self.x >= topLeftCorner.x and self.y >= topLeftCorner.y) and
 		(self.x <= bottomRightCorner.x and self.y <= bottomRightCorner.y)) then
 		event.object.canMove = false
 	end
-	if ((event.object.x >= self.x and event.object.y >= self.y) and 
+	if ((event.object.x >= self.x and event.object.y >= self.y) and
 		(event.object.x <= self.x + self.image:getWidth() and event.object.y <= self.y + self.image:getHeight())) then
 		event.object.canMove = false
 	end
