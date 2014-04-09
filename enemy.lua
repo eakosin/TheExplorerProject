@@ -69,8 +69,29 @@ function enemy:fillEventQueue()
 end
 
 
-function enemy:processEvent(event)
 
+--[[
+enemy:processEvent()
+This function calls processEvent in every object in enemy.
+]]--
+--param: none
+--return: none
+function enemy:processEvent(event)
+	width = event.object.image:getWidth()
+	height = event.object.image:getHeight()
+	topLeftCorner = {x = event.object.x, y = event.object.y}
+	topRightCorner = {x = event.object.x + event.object.image:getWidth(), y = event.object.y}
+	bottomLeftCorner = {x = event.object.x, y = event.object.y + event.object.image:getHeight()}
+	bottomRightCorner = {x = event.object.x + event.object.image:getWidth(), y = event.object.y + event.object.image:getHeight()}
+
+	if (event.name == "collision" ) then
+		if (event.object.x + event.object.dx > self.x and
+			event.object.x + event.object.dx < self.x + self.image:getWidth() and
+			event.object.y + event.object.dy > self.y and
+			event.object.y + event.object.dy < self.y + self.image:getHeight()) then
+			event.object.canMove = false
+		end
+	end
 end
 
 
@@ -82,6 +103,11 @@ This function call processChanges in every existing object in enemy.
 --param: none
 --return: none
 function enemy:processChanges()
+	if (self.canMove) then
+		self.x = self.x + self.dx
+		self.y = self.y + self.dy
+	end
+	self.canMove = true
 
 
 end
