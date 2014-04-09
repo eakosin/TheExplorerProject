@@ -6,6 +6,7 @@ enemy.world = {}
 enemy.id = 0
 enemy.name = ""
 enemy.imageName = "crapenemy.png"
+enemy.width, enemy.height = 0,0
 enemy.x, enemy.y = 0,0
 enemy.dx, enemy.dy = 0,0
 enemy.canMove = true
@@ -79,18 +80,16 @@ This function calls processEvent in every object in enemy.
 function enemy:processEvent(event)
 	width = event.object.image:getWidth()
 	height = event.object.image:getHeight()
-	topLeftCorner = {x = event.object.x, y = event.object.y}
-	topRightCorner = {x = event.object.x + event.object.image:getWidth(), y = event.object.y}
-	bottomLeftCorner = {x = event.object.x, y = event.object.y + event.object.image:getHeight()}
-	bottomRightCorner = {x = event.object.x + event.object.image:getWidth(), y = event.object.y + event.object.image:getHeight()}
-
-	if (event.name == "collision" ) then
-		if (event.object.x + event.object.dx > self.x and
-			event.object.x + event.object.dx < self.x + self.image:getWidth() and
-			event.object.y + event.object.dy > self.y and
-			event.object.y + event.object.dy < self.y + self.image:getHeight()) then
-			event.object.canMove = false
-		end
+	topLeftCorner = {x = event.object.x + event.object.dx, y = event.object.y + event.object.dy}
+	bottomRightCorner = {x = event.object.x + event.object.image:getWidth() + event.object.dx,
+							y = event.object.y + event.object.image:getHeight() + event.object.dy}
+	if ((self.x >= topLeftCorner.x and self.y >= topLeftCorner.y) and
+		(self.x <= bottomRightCorner.x and self.y <= bottomRightCorner.y)) then
+		event.object.canMove = false
+	end
+	if ((event.object.x >= self.x and event.object.y >= self.y) and
+		(event.object.x <= self.x + self.image:getWidth() and event.object.y <= self.y + self.image:getHeight())) then
+		event.object.canMove = false
 	end
 end
 
@@ -108,8 +107,6 @@ function enemy:processChanges()
 		self.y = self.y + self.dy
 	end
 	self.canMove = true
-
-
 end
 
 
