@@ -11,7 +11,7 @@ character.x, character.y = 0,0
 --character.dn, character.ds, character.dw, character.de = 0,0,0,0
 character.dx, character.dy = 0,0
 -- character.canMove = {north = true, south = true, west = true, east = true}
-character.canMove = {x = true, y = true}
+-- character.canMove = {x = true, y = true}
 character.stats = {health = 100, energy = 50, weapon = 5, armor = 5, status = {}}
 
 
@@ -66,16 +66,16 @@ This function calls fillEventQueue in every object in character.
 --return: none
 function character:fillEventQueue()
 	if(self.world.keyState.up) then
-		self.dy = -8
+		self.dy = -4
 	elseif(self.world.keyState.down) then
-		self.dy = 8
+		self.dy = 4
 	else
 		self.dy = 0
 	end
 	if(self.world.keyState.left) then
-		self.dx = -8
+		self.dx = -4
 	elseif(self.world.keyState.right) then
-		self.dx = 8
+		self.dx = 4
 	else
 		self.dx = 0
 	end
@@ -83,13 +83,23 @@ function character:fillEventQueue()
 		self.world.eventQueue.level[#self.world.eventQueue.level + 1] = {destination = "currentlevel",
 																		name = "collisionplayer",
 																		object = self}
+		-- self.world.eventQueue.enemy[#self.world.eventQueue.enemy + 1] = {destination = "all",
+																		-- name = "collisionplayer",
+																		-- object = self}
 	end
 end
 
 
 
-function character:processEvent()
-
+function character:processEvent(event)
+	if(event.name == "collision") then
+		if(not ((event.object.x + event.object.dx > self.x + self.image:getWidth()) or
+			 (event.object.x + event.object.dx + event.object.image:getWidth() < self.x) or
+			 (event.object.y + event.object.dy > self.y + self.image:getHeight()) or
+			 (event.object.y + event.object.dy + event.object.image:getHeight() < self.y))) then
+			event.object.canMove = false
+		end
+	end
 end
 
 
@@ -101,14 +111,8 @@ This function call processChanges in every existing object in character.
 --param: none
 --return: none
 function character:processChanges()
-	if(self.canMove.x) then
-		self.x = self.x + self.dx
-	end
-	if(self.canMove.y) then
-		self.y = self.y + self.dy
-	end
-	self.canMove.x = true
-	self.canMove.y = true
+	self.x = self.x + self.dx
+	self.y = self.y + self.dy
 end
 
 --[[

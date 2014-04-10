@@ -9,6 +9,7 @@ require("character")
 require("enemy")
 require("projectiles")
 require("ai/ai")
+require("ui")
 
 world.lcgrandom = lcgrandom:new()
 world.camera = nil
@@ -19,7 +20,9 @@ world.levels = {}
 world.characters = {}
 world.enemies = {}
 world.projectiles = {}
-world.eventQueue = {level = {}, character = {}, enemy = {}, world = {}, projectile = {}}
+world.ais = {}
+world.ui = {}
+world.eventQueue = {level = {}, character = {}, enemy = {}, world = {}, projectile = {}, ai = {}}
 
 world.currentLevel = 0
 
@@ -35,6 +38,15 @@ function world.fillEventQueue()
 	end
 	for id = 1, #world.characters do
 		world.characters[id]:fillEventQueue()
+	end
+	for id = 1, #world.enemies do
+		world.enemies[id]:fillEventQueue()
+	end
+	for id = 1, #world.ais do
+		world.ais[id]:fillEventQueue()
+	end
+	for id = 1, #world.ui do
+		world.ui[id]:fillEventQueue()
 	end
 end
 
@@ -53,7 +65,6 @@ Send each event in all queues to processing functions for that queue type.
 --return: none
 function world.processEventQueue()
 	for id = 1, #world.eventQueue.world do
-		debugLog:append(tostring(id)..": "..tostring(world.eventQueue.world[id]))
 		world.processWorldEvent(world.eventQueue.world[id])
 	end
 	world.eventQueue.world = {}
@@ -62,17 +73,21 @@ function world.processEventQueue()
 	end
 	world.eventQueue.level = {}
 	for id = 1, #world.eventQueue.character do
-		world.processLevelEvent(world.eventQueue.character[id])
+		world.processCharacterEvent(world.eventQueue.character[id])
 	end
 	world.eventQueue.character = {}
 	for id = 1, #world.eventQueue.enemy do
-		world.processLevelEvent(world.eventQueue.enemy[id])
+		world.processEnemyEvent(world.eventQueue.enemy[id])
 	end
 	world.eventQueue.enemy = {}
 	for id = 1, #world.eventQueue.projectile do
-		world.processLevelEvent(world.eventQueue.projectile[id])
+		world.processProjectileEvent(world.eventQueue.projectile[id])
 	end
 	world.eventQueue.projectile = {}
+	for id = 1, #world.eventQueue.ai do
+		world.processAIEvent(world.eventQueue.ai[id])
+	end
+	world.eventQueue.ai = {}
 end
 
 --[[
@@ -122,26 +137,37 @@ function world.processWorldEvent(event)
 										unpack(world.canvasDimensions))
 	elseif(event.name == "createcharacter") then
 		world.characters[event.id] = character:new(world)
-		character:initialize()
+		world.characters[event.id]:initialize()
 		local levelStart = world.levels[world.currentLevel].terrain.map.start
-		character:placeCharacter(((levelStart.x * 32) - 32), ((levelStart.y * 32) - 32))
+		world.characters[event.id]:placeCharacter(((levelStart.x * 32) - 32), ((levelStart.y * 32) - 32))
 	elseif(event.name == "createenemy") then
-		world.enemies[#world.enemies + 1] = enemy:new(world)
-		enemy:initialize()
-		skipTiles = world.lcgrandom.int(0,16)
+		skipTiles = world.levels[world.currentLevel].lcgrandom:int(0,250)
 		local enemyStart = {x = 0, y = 0}
-		for y = 1, #world.levels[world.currentLevel].terrain.map.height do
-			for x = 1, #world.levels[world.currentLevel].terrain.map.width do
+		for y = 1, world.levels[world.currentLevel].terrain.map.height do
+			for x = 1, world.levels[world.currentLevel].terrain.map.width do
 				if(world.levels[world.currentLevel].terrain.map.grid[x][y] == world.levels[world.currentLevel].terrain.map.tileset.floor) then
+					-- debugLog:append("skipTiles: "..tostring(skipTiles))
 					if(skipTiles <= 0) then
 						enemyStart.x, enemyStart.y = x, y
+						break
 					else
 						skipTiles = skipTiles - 1
 					end
 				end
 			end
+			if(skipTiles <= 0) then
+				break
+			end
 		end
-		enemy:placeEnemy(((enemyStart.x * 32) - 32), ((enemyStart.y * 32) - 32))
+		if(skipTiles <= 0) then
+			world.enemies[event.id] = enemy:new(world)
+			world.enemies[event.id]:initialize()
+			-- debugLog:append("skipTiles: "..tostring(skipTiles))
+			world.enemies[event.id]:placeEnemy(((enemyStart.x * 32) - 32), ((enemyStart.y * 32) - 32))
+		end
+	elseif(event.name == "createai") then
+		world.ais[event.id] = ai:new(world)
+		world.ais[event.id]:initialize()
 	end
 end
 
@@ -173,7 +199,7 @@ Process character events in the character queue and send to the requested charac
 ]]--
 --param: event - event table containing all the event information
 --return: none
-function world.processCharacterEvent(id, event)
+function world.processCharacterEvent(event)
 	if(event.destination == "all") then
 		for id = 1, #world.characters do
 			world.characters[id]:processEvent(event)
@@ -193,7 +219,7 @@ Process enemy events in the enemy queue and send to the requested enemies
 ]]--
 --param: event - event table containing all the event information
 --return: none
-function world.processEnemyEvent(id, event)
+function world.processEnemyEvent(event)
 	if(event.destination == "all") then
 		for id = 1, #world.enemies do
 			world.enemies[id]:processEvent(event)
@@ -213,7 +239,7 @@ Process projectile events in the projectile queue and send to the requested proj
 ]]--
 --param: event - event table containing all the event information
 --return: none
-function world.processProjectileEvent(id, event)
+function world.processProjectileEvent(event)
 	if(event.destination == "all") then
 		for id = 1, #world.projectiles do
 			world.projectiles[id]:processEvent(event)
@@ -222,6 +248,27 @@ function world.processProjectileEvent(id, event)
 		destination = 1
 		while(event[destination]) do
 			world.projectiles[event[destination]]:processEvent(event)
+			destination = destination + 1
+		end
+	end
+end
+
+--[[
+world.processAIEvent:
+Process projectile events in the projectile queue and send to the requested projectiles
+]]--
+--param: event - event table containing all the event information
+--return: none
+function world.processAIEvent(event)
+	debugLog:append("AI Process")
+	if(event.destination == "all") then
+		for id = 1, #world.ais do
+			world.ais[id]:processEvent(event)
+		end
+	else
+		destination = 1
+		while(event[destination]) do
+			world.ais[event[destination]]:processEvent(event)
 			destination = destination + 1
 		end
 	end
@@ -239,6 +286,9 @@ function world.processChanges()
 	end
 	for id = 1, #world.enemies do
 		world.enemies[id]:processChanges()
+	end
+	for id = 1, #world.ais do
+		world.ais[id]:processChanges()
 	end
 end
 

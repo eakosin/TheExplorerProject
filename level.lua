@@ -129,35 +129,60 @@ end
 function level:processEvent(event)
 	if(event.name == "collisionplayer") then
 		topLeftCorner = {x = event.object.x, y = event.object.y}
-		topRightCorner = {x = event.object.x + (event.object.image:getWidth() * 0.5), y = event.object.y}
-		bottomLeftCorner = {x = event.object.x, y = event.object.y + (event.object.image:getHeight() * 0.75)}
-		bottomRightCorner = {x = event.object.x + (event.object.image:getWidth() * 0.5), y = event.object.y + (event.object.image:getHeight() * 0.75)}
-		debugLog:append("topLeftCorner "..tostring(topLeftCorner.x / 32).." "..tostring(topLeftCorner.y / 32).."\n")
-		debugLog:append("bottomRightCorner "..tostring(bottomRightCorner.x / 32).." "..tostring(bottomRightCorner.y / 32).."\n")
-		if(self.terrain.map.grid[helpers.int(topLeftCorner.x / 32) + 1][helpers.int(((topLeftCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
-		   self.terrain.map.grid[helpers.int(topRightCorner.x / 32) + 1][helpers.int(((topRightCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
-		   self.terrain.map.grid[helpers.int(bottomLeftCorner.x / 32) + 1][helpers.int(((bottomLeftCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
-		   self.terrain.map.grid[helpers.int(bottomRightCorner.x / 32) + 1][helpers.int(((bottomRightCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall) then
-			event.object.canMove.y = false
+		topRightCorner = {x = event.object.x + event.object.image:getWidth() - 1, y = event.object.y}
+		bottomLeftCorner = {x = event.object.x, y = event.object.y + event.object.image:getHeight() - 1}
+		bottomRightCorner = {x = event.object.x + event.object.image:getWidth() - 1, y = event.object.y + event.object.image:getHeight() - 1}
+		-- debugLog:append("topLeftCorner "..tostring(topLeftCorner.x / 32).." "..tostring(topLeftCorner.y / 32).."\n")
+		-- debugLog:append("bottomRightCorner "..tostring(bottomRightCorner.x / 32).." "..tostring(bottomRightCorner.y / 32).."\n")
+		while(math.abs(event.object.dy) > 0) do
+			if(self.terrain.map.grid[helpers.int(topLeftCorner.x / 32) + 1][helpers.int((topLeftCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
+			   self.terrain.map.grid[helpers.int(topRightCorner.x / 32) + 1][helpers.int((topRightCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
+			   self.terrain.map.grid[helpers.int(bottomLeftCorner.x / 32) + 1][helpers.int((bottomLeftCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
+			   self.terrain.map.grid[helpers.int(bottomRightCorner.x / 32) + 1][helpers.int((bottomRightCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall) then
+				event.object.dy = event.object.dy - (math.abs(event.object.dy) / event.object.dy)
+			else
+				break
+			end
 		end
-		if(self.terrain.map.grid[helpers.int((topLeftCorner.x + event.object.dx) / 32) + 1][helpers.int((topLeftCorner.y / 32)) + 1] == self.terrain.map.tileset.wall or
-		   self.terrain.map.grid[helpers.int((topRightCorner.x + event.object.dx) / 32) + 1][helpers.int((topRightCorner.y / 32)) + 1] == self.terrain.map.tileset.wall or
-		   self.terrain.map.grid[helpers.int((bottomLeftCorner.x + event.object.dx) / 32) + 1][helpers.int((bottomLeftCorner.y / 32)) + 1] == self.terrain.map.tileset.wall or
-		   self.terrain.map.grid[helpers.int((bottomRightCorner.x + event.object.dx) / 32) + 1][helpers.int((bottomRightCorner.y / 32)) + 1] == self.terrain.map.tileset.wall) then
-			event.object.canMove.x = false
+		while(math.abs(event.object.dx) > 0) do
+			if(self.terrain.map.grid[helpers.int((topLeftCorner.x + event.object.dx) / 32) + 1][helpers.int(topLeftCorner.y / 32) + 1] == self.terrain.map.tileset.wall or
+			   self.terrain.map.grid[helpers.int((topRightCorner.x + event.object.dx) / 32) + 1][helpers.int(topRightCorner.y / 32) + 1] == self.terrain.map.tileset.wall or
+			   self.terrain.map.grid[helpers.int((bottomLeftCorner.x + event.object.dx) / 32) + 1][helpers.int(bottomLeftCorner.y / 32) + 1] == self.terrain.map.tileset.wall or
+			   self.terrain.map.grid[helpers.int((bottomRightCorner.x + event.object.dx) / 32) + 1][helpers.int(bottomRightCorner.y / 32) + 1] == self.terrain.map.tileset.wall) then
+				event.object.dx = event.object.dx - (math.abs(event.object.dx) / event.object.dx)
+			else
+				break
+			end
+		end
+		state = true
+		while(math.abs(event.object.dy) > 0 and math.abs(event.object.dx) > 0) do
+			if(self.terrain.map.grid[helpers.int((topLeftCorner.x + event.object.dx) / 32) + 1][helpers.int((topLeftCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
+			   self.terrain.map.grid[helpers.int((topRightCorner.x + event.object.dx) / 32) + 1][helpers.int((topRightCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
+			   self.terrain.map.grid[helpers.int((bottomLeftCorner.x + event.object.dx) / 32) + 1][helpers.int((bottomLeftCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
+			   self.terrain.map.grid[helpers.int((bottomRightCorner.x + event.object.dx) / 32) + 1][helpers.int((bottomRightCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall) then
+				if(state and math.abs(event.object.dx) > 0) then
+					event.object.dx = event.object.dx - (math.abs(event.object.dx) / event.object.dx)
+				elseif(math.abs(event.object.dy) > 0) then
+					event.object.dy = event.object.dy - (math.abs(event.object.dy) / event.object.dy)
+				end
+				state = not state
+			else
+				break
+			end
 		end
 	--Generic bounding box based collision checking.
 	--Use object.x, object.y and (object.x + object.image.getWidth()) and (object.y + object.image.getHeight()) to find the bounding box.
 	elseif(event.name == "collision") then
+		-- debugLog:append("Test: "..tostring(event.object.x))
 		--debugLog:append(tostring(helpers.int((event.object.x + 32) / 32))..","..tostring(helpers.int(((event.object.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.object.x / 32) + 32)][helpers.int((event.object.y / 32))]))
 		topLeftCorner = {x = event.object.x, y = event.object.y}
 		topRightCorner = {x = event.object.x + (event.object.image:getWidth() * (event.object.image:getWidth() / 32)), y = event.object.y}
 		bottomLeftCorner = {x = event.object.x, y = event.object.y + (event.object.image:getHeight() * (event.object.image:getHeight() / 32))}
 		bottomRightCorner = {x = event.object.x + (event.object.image:getWidth() * (event.object.image:getWidth() / 32)), y = event.object.y + (event.object.image:getHeight() * (event.object.image:getHeight() / 32))}
-		if(self.terrain.map.grid[helpers.int((topLeftCorner.x + event.object.dx) / 32) + 1][helpers.int(((topLeftCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
-		   self.terrain.map.grid[helpers.int((topRightCorner.x + event.object.dx) / 32) + 1][helpers.int(((topRightCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
-		   self.terrain.map.grid[helpers.int((bottomLeftCorner.x + event.object.dx) / 32) + 1][helpers.int(((bottomLeftCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
-		   self.terrain.map.grid[helpers.int((bottomRightCorner.x + event.object.dx) / 32) + 1][helpers.int(((bottomRightCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall) then
+		if(self.terrain.map.grid[helpers.int((topLeftCorner.x + event.object.dx) / 32) + 1][helpers.int((topLeftCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
+		   self.terrain.map.grid[helpers.int((topRightCorner.x + event.object.dx) / 32) + 1][helpers.int((topRightCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
+		   self.terrain.map.grid[helpers.int((bottomLeftCorner.x + event.object.dx) / 32) + 1][helpers.int((bottomLeftCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
+		   self.terrain.map.grid[helpers.int((bottomRightCorner.x + event.object.dx) / 32) + 1][helpers.int((bottomRightCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall) then
 			event.object.canMove = false
 		end
 	end

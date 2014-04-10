@@ -30,7 +30,7 @@ function ai:new(world)
 	return new
 end
 
-function ai:initalize(aiType)
+function ai:initialize(aiType)
 	self.aiType = aiType or self.aiType
 end
 
@@ -40,7 +40,7 @@ end
 
 function ai:processEvent(event)
 	if(event.name == "enemyai") then
-		
+		self.enemies.scripts[1].process(event.object, self.world)
 	end
 end
 

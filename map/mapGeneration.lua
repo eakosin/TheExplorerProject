@@ -5,11 +5,8 @@ mapGeneration = {}
 mapGeneration.scriptLocations = {"base", "modify", "decorate"}--, "populate", "dynamic"}
 
 function mapGeneration.loadScripts()
-	debugLog:append("Here")
 	for i = 1, #mapGeneration.scriptLocations do
-		debugLog:append(mapGeneration.scriptLocations[i])
 		if(love.filesystem.exists("map/generation/"..mapGeneration.scriptLocations[i])) then
-			debugLog:append(love.filesystem.exists("map/generation/"..mapGeneration.scriptLocations[i]))
 			mapGeneration[mapGeneration.scriptLocations[i]] = {}
 			mapGeneration[mapGeneration.scriptLocations[i]].scripts = {}
 			for _,file in pairs(love.filesystem.getDirectoryItems("map/generation/"..mapGeneration.scriptLocations[i])) do
@@ -68,7 +65,7 @@ end
 function mapGeneration.configureScript(script,scriptType,layer,level)
 	local constraint
 	local dependList = {}
-	debugLog:append("Script: "..tostring(script.name))
+	-- debugLog:append("Script: "..tostring(script.name))
 	for _,parameter in pairs(script.parameters) do
 		if(script.constraint[parameter].range) then
 			constraint = script.constraint[parameter].range
@@ -88,20 +85,20 @@ function mapGeneration.configureScript(script,scriptType,layer,level)
 		elseif(script.constraint[parameter].depend) then
 			dependList[#dependList + 1] = parameter
 		elseif(script.constraint[parameter].none) then
-			debugLog:append(script[parameter])
+			-- debugLog:append(script[parameter])
 			level[layer].scripts[scriptType][parameter] = script[parameter]
 		end
 		--Print Parameters DEBUG
-		if(type(level[layer].scripts[scriptType][parameter]) == "table") then
-			debugLog:append(parameter..":")
-			for k,v in pairs(level[layer].scripts[scriptType][parameter]) do
-				debugLog:append("  "..tostring(k)..": "..tostring(v))
-			end
-		else
-			debugLog:append(tostring(parameter)..": "..tostring(level[layer].scripts[scriptType][parameter]))
-		end
+		-- if(type(level[layer].scripts[scriptType][parameter]) == "table") then
+			-- debugLog:append(parameter..":")
+			-- for k,v in pairs(level[layer].scripts[scriptType][parameter]) do
+				-- debugLog:append("  "..tostring(k)..": "..tostring(v))
+			-- end
+		-- else
+			-- debugLog:append(tostring(parameter)..": "..tostring(level[layer].scripts[scriptType][parameter]))
+		-- end
 	end
-	debugLog:append("Depend:")
+	-- debugLog:append("Depend:")
 	--Depend Constraints
 	if(script.constraint.depend) then
 		constraint = level.lcgrandom:int32()
@@ -110,17 +107,17 @@ function mapGeneration.configureScript(script,scriptType,layer,level)
 		for _,parameter in pairs(dependList) do
 			level[layer].scripts[scriptType][parameter] = script[parameter]
 			--Print Depend Parameters DEBUG
-			if(type(level[layer].scripts[scriptType][parameter]) == "table") then
-				debugLog:append(parameter..":")
-				for k,v in pairs(level[layer].scripts[scriptType][parameter]) do
-					debugLog:append("  "..tostring(k)..": "..tostring(v))
-				end
-			else
-				debugLog:append(tostring(parameter)..": "..tostring(level[layer].scripts[scriptType][parameter]))
-			end
+			-- if(type(level[layer].scripts[scriptType][parameter]) == "table") then
+				-- debugLog:append(parameter..":")
+				-- for k,v in pairs(level[layer].scripts[scriptType][parameter]) do
+					-- debugLog:append("  "..tostring(k)..": "..tostring(v))
+				-- end
+			-- else
+				-- debugLog:append(tostring(parameter)..": "..tostring(level[layer].scripts[scriptType][parameter]))
+			-- end
 		end
 	end
-	debugLog:append()
+	-- debugLog:append()
 end
 
 function mapGeneration.runScript(script, map, ...)

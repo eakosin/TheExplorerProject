@@ -33,7 +33,7 @@ function menu.processEventQueue()
 	for id = 1, #menu.eventQueue do
 		event = menu.eventQueue[id]
 		if(event.name == "leftclick") then
-			debugLog:append(event.name.." "..tostring(event.x)..", "..tostring(event.y))
+			-- debugLog:append(event.name.." "..tostring(event.x)..", "..tostring(event.y))
 			for _,button in pairs(menu.screen.main.buttons) do
 				if((button.text == "Quit") and
 					(button.x < event.x) and
@@ -50,7 +50,12 @@ function menu.processEventQueue()
 					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "generatelevels", number = 1}
 					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "changelevel", id = 1}
 					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "createcharacter", id = 1}
-					debugLog:append("menu "..tostring(menu.world.eventQueue.world[1]))
+					for i = 1, 25 do
+						menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "createenemy", id = i}
+					end
+					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "createai", id = 1}
+					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "createhealthbar", id = 1}
+					-- debugLog:append("menu "..tostring(menu.world.eventQueue.world[1]))
 					menu.visible = false
 					menu.world.loading = true
 				end
