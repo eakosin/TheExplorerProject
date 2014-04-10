@@ -2,17 +2,20 @@ require("map/mapTypes")
 
 mapGeneration = {}
 
-scriptLocations = {"base", "modify", "decorate"}--, "populate", "dynamic"}
+mapGeneration.scriptLocations = {"base", "modify", "decorate"}--, "populate", "dynamic"}
 
 function mapGeneration.loadScripts()
-	for i = 1, #scriptLocations do
-		if(love.filesystem.exists("map/generation/"..scriptLocations[i])) then
-			mapGeneration[scriptLocations[i]] = {}
-			mapGeneration[scriptLocations[i]].scripts = {}
-			for _,file in pairs(love.filesystem.getDirectoryItems("map/generation/"..scriptLocations[i])) do
+	debugLog:append("Here")
+	for i = 1, #mapGeneration.scriptLocations do
+		debugLog:append(mapGeneration.scriptLocations[i])
+		if(love.filesystem.exists("map/generation/"..mapGeneration.scriptLocations[i])) then
+			debugLog:append(love.filesystem.exists("map/generation/"..mapGeneration.scriptLocations[i]))
+			mapGeneration[mapGeneration.scriptLocations[i]] = {}
+			mapGeneration[mapGeneration.scriptLocations[i]].scripts = {}
+			for _,file in pairs(love.filesystem.getDirectoryItems("map/generation/"..mapGeneration.scriptLocations[i])) do
 				scriptName = file:divide("%.")
-				script = require("map/generation/"..scriptLocations[i].."/"..scriptName)
-				mapGeneration[scriptLocations[i]].scripts[script.id] = script
+				script = require("map/generation/"..mapGeneration.scriptLocations[i].."/"..scriptName)
+				mapGeneration[mapGeneration.scriptLocations[i]].scripts[script.id] = script
 			end
 		end
 	end

@@ -8,6 +8,7 @@ require("level")
 require("character")
 require("enemy")
 require("projectiles")
+require("ai/ai")
 
 world.lcgrandom = lcgrandom:new()
 world.camera = nil
@@ -124,6 +125,23 @@ function world.processWorldEvent(event)
 		character:initialize()
 		local levelStart = world.levels[world.currentLevel].terrain.map.start
 		character:placeCharacter(((levelStart.x * 32) - 32), ((levelStart.y * 32) - 32))
+	elseif(event.name == "createenemy") then
+		world.enemies[#world.enemies + 1] = enemy:new(world)
+		enemy:initialize()
+		skipTiles = world.lcgrandom.int(0,16)
+		local enemyStart = {x = 0, y = 0}
+		for y = 1, #world.levels[world.currentLevel].terrain.map.height do
+			for x = 1, #world.levels[world.currentLevel].terrain.map.width do
+				if(world.levels[world.currentLevel].terrain.map.grid[x][y] == world.levels[world.currentLevel].terrain.map.tileset.floor) then
+					if(skipTiles <= 0) then
+						enemyStart.x, enemyStart.y = x, y
+					else
+						skipTiles = skipTiles - 1
+					end
+				end
+			end
+		end
+		enemy:placeEnemy(((enemyStart.x * 32) - 32), ((enemyStart.y * 32) - 32))
 	end
 end
 
@@ -219,6 +237,9 @@ function world.processChanges()
 	for id = 1, #world.characters do
 		world.characters[id]:processChanges()
 	end
+	for id = 1, #world.enemies do
+		world.enemies[id]:processChanges()
+	end
 end
 
 --[[
@@ -241,6 +262,9 @@ function world.draw()
 	world.levels[world.currentLevel]:draw()
 	for id = 1, #world.characters do
 		world.characters[id]:draw()
+	end
+	for id = 1, #world.enemies do
+		world.enemies[id]:draw()
 	end
 end
 
@@ -275,5 +299,6 @@ function world.initialize(parameters)
 	end
 	debugLog:append("World Seed: "..tostring(world.seed).." Iteration Count: "..tostring(count))
 	mapGeneration.loadScripts()
+	ai:loadScripts()
 	world.canvasDimensions = {world.drawingCanvas:getDimensions()}
 end

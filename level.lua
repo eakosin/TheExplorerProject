@@ -129,9 +129,9 @@ end
 function level:processEvent(event)
 	if(event.name == "collisionplayer") then
 		topLeftCorner = {x = event.object.x, y = event.object.y}
-		topRightCorner = {x = event.object.x + event.object.image:getWidth(), y = event.object.y}
-		bottomLeftCorner = {x = event.object.x, y = event.object.y + event.object.image:getHeight()}
-		bottomRightCorner = {x = event.object.x + event.object.image:getWidth(), y = event.object.y + event.object.image:getHeight()}
+		topRightCorner = {x = event.object.x + (event.object.image:getWidth() * 0.5), y = event.object.y}
+		bottomLeftCorner = {x = event.object.x, y = event.object.y + (event.object.image:getHeight() * 0.75)}
+		bottomRightCorner = {x = event.object.x + (event.object.image:getWidth() * 0.5), y = event.object.y + (event.object.image:getHeight() * 0.75)}
 		debugLog:append("topLeftCorner "..tostring(topLeftCorner.x / 32).." "..tostring(topLeftCorner.y / 32).."\n")
 		debugLog:append("bottomRightCorner "..tostring(bottomRightCorner.x / 32).." "..tostring(bottomRightCorner.y / 32).."\n")
 		if(self.terrain.map.grid[helpers.int(topLeftCorner.x / 32) + 1][helpers.int(((topLeftCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
@@ -151,9 +151,9 @@ function level:processEvent(event)
 	elseif(event.name == "collision") then
 		--debugLog:append(tostring(helpers.int((event.object.x + 32) / 32))..","..tostring(helpers.int(((event.object.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.object.x / 32) + 32)][helpers.int((event.object.y / 32))]))
 		topLeftCorner = {x = event.object.x, y = event.object.y}
-		topRightCorner = {x = event.object.x + event.object.image:getWidth(), y = event.object.y}
-		bottomLeftCorner = {x = event.object.x, y = event.object.y + event.object.image:getHeight()}
-		bottomRightCorner = {x = event.object.x + event.object.image:getWidth(), y = event.object.y + event.object.image:getHeight()}
+		topRightCorner = {x = event.object.x + (event.object.image:getWidth() * (event.object.image:getWidth() / 32)), y = event.object.y}
+		bottomLeftCorner = {x = event.object.x, y = event.object.y + (event.object.image:getHeight() * (event.object.image:getHeight() / 32))}
+		bottomRightCorner = {x = event.object.x + (event.object.image:getWidth() * (event.object.image:getWidth() / 32)), y = event.object.y + (event.object.image:getHeight() * (event.object.image:getHeight() / 32))}
 		if(self.terrain.map.grid[helpers.int((topLeftCorner.x + event.object.dx) / 32) + 1][helpers.int(((topLeftCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
 		   self.terrain.map.grid[helpers.int((topRightCorner.x + event.object.dx) / 32) + 1][helpers.int(((topRightCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
 		   self.terrain.map.grid[helpers.int((bottomLeftCorner.x + event.object.dx) / 32) + 1][helpers.int(((bottomLeftCorner.y + event.object.dy) / 32)) + 1] == self.terrain.map.tileset.wall or
