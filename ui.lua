@@ -62,10 +62,10 @@ progressBar.active = false
 progressBar.backImageName = ""
 progressBar.frontImageName = ""
 progressBar.vertices = { 
-	{0, 0, 0, 0, 255, 255, 255},		
-	{progressBar.width, 0, 0, 0, 255, 255, 255},		
-	{0, progressBar.height, 0, 0, 255, 255, 255},		
-	{progressBar.width, progressBar.height, 0, 0, 255, 255, 255},		
+	{0, 0, 0, 0, 255, 255, 255, 255},		
+	{progressBar.width/2, 0, 1, 0, 255, 255, 255, 255},		
+	{0, progressBar.height, 0, 1, 255, 255, 255, 255},		
+	{progressBar.width/2, progressBar.height, 1, 1, 255, 255, 255, 255},		
 	}		
 progressBar.progressBarMesh = {}
 progressBar.progressBarQuad = {}
@@ -74,8 +74,8 @@ progressBar.progressBarQuad = {}
 progressBar:new()
 Creates a new progresss bar if the param is nil
 ]]--
---param: new - the object to be set as the button. 
---returns: new - the object after the button is created and setup.
+--param: new - the object to be set as the progress bar. 
+--returns: new - the object after the progress bar is created and setup.
 function progressBar:new(new)
 	new = new or {}
 	setmetatable(new, self)
@@ -102,7 +102,7 @@ function progressBar:configure(parameters)
 	love.graphics.setCanvas(self.canvas)
 	love.graphics.setBackgroundColor(0,0,0,0)
 	love.graphics.clear()
-	love.graphics.draw(self.backImage)
+	love.graphics.draw(self.backImage, self.width/self.backImage:getWidth(), self.height/self.backImage:getHeight())
 	love.graphics.setFont(self.font)
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.print(self.text, self.textOffset, ((self.height / 2) - (self.font:getHeight() / 2) - 2))
@@ -117,13 +117,20 @@ function progressBar:configure(parameters)
 
 end
 
+--[[
+progressBar:update()
+updates the width of the progress bar
+]]--
+--param: parameters - value = number to be displayed, maximum = number that is the max of the progress bar
+--return: none
 function progressBar:update(parameters)
 	value = parameters[value] and parameters[value] or 0
-	max = parameters[max] and parameters[max] or 1
-	fraction = value/max
+	maximum = parameters[maximum] and parameters[maximum] or 1
+	fraction = value/maximum
 	
 	self.vertices[2][1] = self.width*fraction
 	self.vertices[4][1] = self.width*fraction
+	self.progressBarMesh:setVertices(self.vertices)
 end
 
 --[[
@@ -136,4 +143,61 @@ function progressBar:draw()
 	love.graphics.draw(self.canvas, self.x, self.y)
 	love.graphics.draw(self.progressBarMesh, self.x, self.y)
 --	love.graphics.print("frontStuff", self.x, self.y)
+end
+
+--[[
+line object
+]]--
+line = {}
+line.points = {x1, y1, x2, y2}
+line.color = {255, 255, 255, 255}
+line.thicknes = 0
+line.style = "rough"
+
+
+--[[
+line:new()
+Creates a new line if the param is nil
+]]--
+--param: new - the object to be set as the line. 
+--returns: new - the object after the line is created and setup.
+function line:new(new)
+    	new = {}
+	setmetatable(new, self)
+    	self.__index = self
+    	return new
+end
+
+--[[
+line:configure()
+Builds the line's properties based on the parameters passed in
+]]--
+--param: parameters - the list of values to set as the line's atributes
+--return: none
+function line:configure(params)
+	self:update(params)
+end
+
+--[[
+line:update()
+updates the values of the line object.
+]]--
+--param: params - the keys and their values to be set as the objects values
+--return: none
+function line:update(params)
+	for key, value in pairs(parameters) do
+		self[key] = value
+	end
+end
+
+--[[
+line:draw()
+draws the line object
+]]--
+--param: none
+--return: none
+function line:draw()
+	love.graphics.setColor(unpack(self.color))
+	love.graphics.setLine(self.thickness, self.style)
+	love.graphics.line(unpack(self.points))
 end

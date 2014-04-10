@@ -45,12 +45,27 @@ end
 function projectile:processEvent(event)
 	if(event.name == "collision") then
 	--change or modify projectile based off of user action and projectile class
+<<<<<<< HEAD
 		if(not ((event.object.x + event.object.dx > self.x + self.image:getWidth()) or
 			 (event.object.x + event.object.dx + event.object.image:getWidth() < self.x) or
 			 (event.object.y + event.object.dy > self.y + self.image:getHeight()) or
 			 (event.object.y + event.object.dy + event.object.image:getHeight() < self.y))) then
 			event.object.canMove = false
 		end
+=======
+	width = event.object.image:getWidth()
+	height = event.object.image:getHeight()
+	topLeftCorner = {x = event.object.x + event.object.dx, y = event.object.y + event.object.dy}
+	bottomRightCorner = {x = event.object.x + event.object.image:getWidth() + event.object.dx,
+							y = event.object.y + event.object.image:getHeight() + event.object.dy}
+	if ((self.x >= topLeftCorner.x and self.y >= topLeftCorner.y) and
+		(self.x <= bottomRightCorner.x and self.y <= bottomRightCorner.y)) then
+		event.object.canMove = false
+	end
+	if ((event.object.x >= self.x and event.object.y >= self.y) and
+		(event.object.x <= self.x + self.image:getWidth() and event.object.y <= self.y + self.image:getHeight())) then
+		event.object.canMove = false
+>>>>>>> 5f0110b7b86e3d60d277baa42282e6ed268ba79e
 	end
 end
 function projectile:processChanges()

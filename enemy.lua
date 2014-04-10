@@ -6,6 +6,7 @@ enemy.world = {}
 enemy.id = 0
 enemy.name = ""
 enemy.imageName = "crapenemy.png"
+enemy.width, enemy.height = 0,0
 enemy.x, enemy.y = 0,0
 enemy.dx, enemy.dy = 0,0
 enemy.canMove = false
@@ -80,6 +81,7 @@ function enemy:fillEventQueue()
 end
 
 
+<<<<<<< HEAD
 function enemy:processEvent(event)
 	if(event.name == "collision") then
 		if(event.object ~= self) then
@@ -127,6 +129,28 @@ function enemy:processEvent(event)
 				break
 			end
 		end
+=======
+
+--[[
+enemy:processEvent()
+This function calls processEvent in every object in enemy.
+]]--
+--param: none
+--return: none
+function enemy:processEvent(event)
+	width = event.object.image:getWidth()
+	height = event.object.image:getHeight()
+	topLeftCorner = {x = event.object.x + event.object.dx, y = event.object.y + event.object.dy}
+	bottomRightCorner = {x = event.object.x + event.object.image:getWidth() + event.object.dx,
+							y = event.object.y + event.object.image:getHeight() + event.object.dy}
+	if ((self.x >= topLeftCorner.x and self.y >= topLeftCorner.y) and
+		(self.x <= bottomRightCorner.x and self.y <= bottomRightCorner.y)) then
+		event.object.canMove = false
+	end
+	if ((event.object.x >= self.x and event.object.y >= self.y) and
+		(event.object.x <= self.x + self.image:getWidth() and event.object.y <= self.y + self.image:getHeight())) then
+		event.object.canMove = false
+>>>>>>> 5f0110b7b86e3d60d277baa42282e6ed268ba79e
 	end
 end
 
@@ -139,10 +163,18 @@ This function call processChanges in every existing object in enemy.
 --param: none
 --return: none
 function enemy:processChanges()
+<<<<<<< HEAD
 	if(self.canMove) then
 		self.x = self.x + self.dx
 		self.y = self.y + self.dy
 	end
+=======
+	if (self.canMove) then
+		self.x = self.x + self.dx
+		self.y = self.y + self.dy
+	end
+	self.canMove = true
+>>>>>>> 5f0110b7b86e3d60d277baa42282e6ed268ba79e
 end
 
 
