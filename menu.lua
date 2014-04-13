@@ -55,6 +55,7 @@ function menu.processEventQueue()
 					end
 					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "createai", id = 1}
 					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "createhealthbar", id = 1}
+					menu.world.eventQueue.world[#menu.world.eventQueue.world + 1] = {name = "initui", id = 1}
 					-- debugLog:append("menu "..tostring(menu.world.eventQueue.world[1]))
 					menu.visible = false
 					menu.world.loading = true

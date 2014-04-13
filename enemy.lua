@@ -3,6 +3,7 @@ require("helpers")
 enemy = {}
 
 enemy.world = {}
+enemy.type = "enemy"
 enemy.id = 0
 enemy.name = ""
 enemy.imageName = "crapenemy.png"
@@ -97,40 +98,42 @@ function enemy:processEvent(event)
 			end
 		end
 	elseif(event.name == "collisionplayer") then
-		while(math.abs(event.object.dx) > 0) do
-			if(not ((event.object.x + event.object.dx > self.x + self.image:getWidth() - 1) or
-				 (event.object.x + event.object.dx + event.object.image:getWidth() - 1 < self.x) or
-				 (event.object.y > self.y + self.image:getHeight() - 1) or
-				 (event.object.y + event.object.image:getHeight() - 1 < self.y))) then
-				event.object.dx = event.object.dx - (math.abs(event.object.dx) / event.object.dx)
-			else
-				break
-			end
-		end
-		while(math.abs(event.object.y) > 0) do
-			if(not ((event.object.x > self.x + self.image:getWidth() - 1) or
-					   (event.object.x + event.object.image:getWidth() - 1 < self.x) or
-					   (event.object.y + event.object.dy > self.y + self.image:getHeight() - 1) or
-					   (event.object.y + event.object.dy + event.object.image:getHeight() - 1 < self.y))) then
-				event.object.dy = event.object.dy - (math.abs(event.object.dy) / event.object.dy)
-			else
-				break
-			end
-		end
-		state = true
-		while(math.abs(event.object.y) > 0 and math.abs(event.object.x) > 0) do
-			if(not ((event.object.x + event.object.dx > self.x + self.image:getWidth() - 1) or
-					   (event.object.x + event.object.dx + event.object.image:getWidth() - 1 < self.x) or
-					   (event.object.y + event.object.dy > self.y + self.image:getHeight() - 1) or
-					   (event.object.y + event.object.dy + event.object.image:getHeight() - 1 < self.y))) then
-				if(state and math.abs(event.object.x) > 0) then
+		if(event.object ~= self) then
+			while(math.abs(event.object.dx) > 0) do
+				if(not ((event.object.x + event.object.dx > self.x + self.image:getWidth() - 1) or
+					 (event.object.x + event.object.dx + event.object.image:getWidth() - 1 < self.x) or
+					 (event.object.y > self.y + self.image:getHeight() - 1) or
+					 (event.object.y + event.object.image:getHeight() - 1 < self.y))) then
 					event.object.dx = event.object.dx - (math.abs(event.object.dx) / event.object.dx)
-				elseif(math.abs(event.object.y) > 0) then
-					event.object.dy = event.object.dy - (math.abs(event.object.dy) / event.object.dy)
+				else
+					break
 				end
-				state = not state
-			else
-				break
+			end
+			while(math.abs(event.object.y) > 0) do
+				if(not ((event.object.x > self.x + self.image:getWidth() - 1) or
+						   (event.object.x + event.object.image:getWidth() - 1 < self.x) or
+						   (event.object.y + event.object.dy > self.y + self.image:getHeight() - 1) or
+						   (event.object.y + event.object.dy + event.object.image:getHeight() - 1 < self.y))) then
+					event.object.dy = event.object.dy - (math.abs(event.object.dy) / event.object.dy)
+				else
+					break
+				end
+			end
+			state = true
+			while(math.abs(event.object.y) > 0 and math.abs(event.object.x) > 0) do
+				if(not ((event.object.x + event.object.dx > self.x + self.image:getWidth() - 1) or
+						   (event.object.x + event.object.dx + event.object.image:getWidth() - 1 < self.x) or
+						   (event.object.y + event.object.dy > self.y + self.image:getHeight() - 1) or
+						   (event.object.y + event.object.dy + event.object.image:getHeight() - 1 < self.y))) then
+					if(state and math.abs(event.object.x) > 0) then
+						event.object.dx = event.object.dx - (math.abs(event.object.dx) / event.object.dx)
+					elseif(math.abs(event.object.y) > 0) then
+						event.object.dy = event.object.dy - (math.abs(event.object.dy) / event.object.dy)
+					end
+					state = not state
+				else
+					break
+				end
 			end
 		end
 	end

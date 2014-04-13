@@ -3,6 +3,7 @@ require("helpers")
 character = {}
 
 character.world = {}
+character.type = "character"
 character.id = 0
 character.name = ""
 character.isPlayer = true
@@ -98,6 +99,9 @@ function character:processEvent(event)
 			 (event.object.y + event.object.dy > self.y + self.image:getHeight()) or
 			 (event.object.y + event.object.dy + event.object.image:getHeight() < self.y))) then
 			event.object.canMove = false
+			if(event.object.type == "enemy") then
+				self.stats.health = self.stats.health - 1
+			end
 		end
 	end
 end
@@ -111,6 +115,10 @@ This function call processChanges in every existing object in character.
 --param: none
 --return: none
 function character:processChanges()
+	if(self.stats.health <= 0 and not self.world.dead) then
+		self.stats.health = 0
+		world.eventQueue.world[#world.eventQueue.world + 1] = {name = "dead"}
+	end
 	self.x = self.x + self.dx
 	self.y = self.y + self.dy
 end

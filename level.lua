@@ -4,6 +4,7 @@ require("map/mapGeneration")
 require("lcgrandom")
 
 level = {terrain = {}, decorate = {}, dynamic = {}}
+level.type = "level"
 level.world = {}
 level.id = 0
 level.name = "Level 0"
@@ -176,9 +177,9 @@ function level:processEvent(event)
 		-- debugLog:append("Test: "..tostring(event.object.x))
 		--debugLog:append(tostring(helpers.int((event.object.x + 32) / 32))..","..tostring(helpers.int(((event.object.y + 32) / 32))).." - "..tostring(self.terrain.map.grid[helpers.int((event.object.x / 32) + 32)][helpers.int((event.object.y / 32))]))
 		topLeftCorner = {x = event.object.x, y = event.object.y}
-		topRightCorner = {x = event.object.x + (event.object.image:getWidth() * (event.object.image:getWidth() / 32)), y = event.object.y}
-		bottomLeftCorner = {x = event.object.x, y = event.object.y + (event.object.image:getHeight() * (event.object.image:getHeight() / 32))}
-		bottomRightCorner = {x = event.object.x + (event.object.image:getWidth() * (event.object.image:getWidth() / 32)), y = event.object.y + (event.object.image:getHeight() * (event.object.image:getHeight() / 32))}
+		topRightCorner = {x = event.object.x + event.object.image:getWidth() - 1, y = event.object.y}
+		bottomLeftCorner = {x = event.object.x, y = event.object.y + event.object.image:getHeight() - 1}
+		bottomRightCorner = {x = event.object.x + event.object.image:getWidth() - 1, y = event.object.y + event.object.image:getHeight() - 1}
 		if(self.terrain.map.grid[helpers.int((topLeftCorner.x + event.object.dx) / 32) + 1][helpers.int((topLeftCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
 		   self.terrain.map.grid[helpers.int((topRightCorner.x + event.object.dx) / 32) + 1][helpers.int((topRightCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or
 		   self.terrain.map.grid[helpers.int((bottomLeftCorner.x + event.object.dx) / 32) + 1][helpers.int((bottomLeftCorner.y + event.object.dy) / 32) + 1] == self.terrain.map.tileset.wall or

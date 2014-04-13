@@ -59,16 +59,10 @@ progressBar.x, progressBar.y = 0, 0
 progressBar.text = ""
 progressBar.textOffset = 4
 progressBar.active = false
-progressBar.backImageName = ""
+progressBar.backImageName = "crapbuttonback.png"
 progressBar.frontImageName = ""
-progressBar.vertices = { 
-	{0, 0, 0, 0, 255, 255, 255, 255},		
-	{progressBar.width/2, 0, 1, 0, 255, 255, 255, 255},		
-	{0, progressBar.height, 0, 1, 255, 255, 255, 255},		
-	{progressBar.width/2, progressBar.height, 1, 1, 255, 255, 255, 255},		
-	}		
+progressBar.vertices = {}
 progressBar.progressBarMesh = {}
-progressBar.progressBarQuad = {}
 
 --[[
 progressBar:new()
@@ -76,10 +70,12 @@ Creates a new progresss bar if the param is nil
 ]]--
 --param: new - the object to be set as the progress bar. 
 --returns: new - the object after the progress bar is created and setup.
-function progressBar:new(new)
-	new = new or {}
+function progressBar:new()
+	new = {}
 	setmetatable(new, self)
 	self.__index = self
+	new.vertices = {}
+	new.progressBarMesh = {}
 	return new
 end
 
@@ -107,10 +103,17 @@ function progressBar:configure(parameters)
 	love.graphics.setColor(255, 255, 255, 255)
 	love.graphics.print(self.text, self.textOffset, ((self.height / 2) - (self.font:getHeight() / 2) - 2))
 	
+	self.vertices = { 
+	{0, 0, 0, 0, 255, 255, 255, 255},		
+	{self.width, 0, 1, 0, 255, 255, 255, 255},		
+	{0, self.height, 0, 1, 255, 255, 255, 255},		
+	{self.width, self.height, 1, 1, 255, 255, 255, 255}
+	}
+	
 	--configure front side of progress bar
-	self.frontImage = love.graphics.newImage("images/crapbackground.png")
+	self.frontImage = love.graphics.newImage("images/crapbuttonfront.png")
 	self.progressBarMesh = love.graphics.newMesh(self.vertices, self.frontImage, "triangles")
-	self.progressBarMesh:setVertexMap(1,2,3,4,2,3)
+	self.progressBarMesh:setVertexMap(1,2,3,3,2,4)
 	
 	--reset global canvas
 	love.graphics.setCanvas()
@@ -124,13 +127,27 @@ updates the width of the progress bar
 --param: parameters - value = number to be displayed, maximum = number that is the max of the progress bar
 --return: none
 function progressBar:update(parameters)
-	value = parameters[value] and parameters[value] or 0
-	maximum = parameters[maximum] and parameters[maximum] or 1
+	debugLog:append("Updating!")
+	value = parameters.value and parameters.value or 0
+	maximum = parameters.maximum and parameters.maximum or 1
 	fraction = value/maximum
+	
+	debugLog:append(tostring(fraction))
 	
 	self.vertices[2][1] = self.width*fraction
 	self.vertices[4][1] = self.width*fraction
+	self.vertices[2][3] = fraction
+	self.vertices[4][3] = fraction
+	debugString = ""
+	for vi = 1, #self.vertices do
+		for i = 1, #self.vertices[vi] do
+			debugString = debugString..tostring(self.vertices[vi][i]).." "
+		end
+		debugString = debugString.."\n"
+	end
+	debugLog:append(debugString)
 	self.progressBarMesh:setVertices(self.vertices)
+	self.progressBarMesh:setVertexMap(1,2,3,3,2,4)
 end
 
 --[[
@@ -140,9 +157,9 @@ sends the progress bar canvas to the love library to draw it on the screen
 --param: none
 --return: none
 function progressBar:draw()
+	debugLog:append("Drawing!")
 	love.graphics.draw(self.canvas, self.x, self.y)
 	love.graphics.draw(self.progressBarMesh, self.x, self.y)
---	love.graphics.print("frontStuff", self.x, self.y)
 end
 
 --[[
@@ -151,7 +168,7 @@ line object
 line = {}
 line.points = {x1, y1, x2, y2}
 line.color = {255, 255, 255, 255}
-line.thicknes = 0
+line.thicknes = 2
 line.style = "rough"
 
 
@@ -162,10 +179,10 @@ Creates a new line if the param is nil
 --param: new - the object to be set as the line. 
 --returns: new - the object after the line is created and setup.
 function line:new(new)
-    	new = {}
+    new = new or {}
 	setmetatable(new, self)
-    	self.__index = self
-    	return new
+    self.__index = self
+    return new
 end
 
 --[[

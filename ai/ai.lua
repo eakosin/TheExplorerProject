@@ -1,6 +1,7 @@
 require("helpers")
 
 ai = {}
+ai.type = "ai"
 ai.aiType = "1"
 ai.consistentData = {}
 ai.delay = 0

@@ -15,6 +15,7 @@ world.lcgrandom = lcgrandom:new()
 world.camera = nil
 world.levelChange = false
 world.loading = false
+world.dead = false
 
 world.levels = {}
 world.characters = {}
@@ -44,9 +45,6 @@ function world.fillEventQueue()
 	end
 	for id = 1, #world.ais do
 		world.ais[id]:fillEventQueue()
-	end
-	for id = 1, #world.ui do
-		world.ui[id]:fillEventQueue()
 	end
 end
 
@@ -97,7 +95,7 @@ Process global events in the world queue
 --param: event - event table containing all the event information
 --return: none
 function world.processWorldEvent(event)
-	debugLog:append(tostring(event))
+	debugLog:append(event.name)
 	if(event.name == "generatelevels") then
 		event.number = event.number or 3
 		for id = 1, event.number do
@@ -124,6 +122,16 @@ function world.processWorldEvent(event)
 			world.levels = {}
 		end
 		collectgarbage()
+	elseif(event.name == "destroy") then
+		world.levels = {}
+		world.characters = {}
+		world.enemies = {}
+		world.projectiles = {}
+		world.ais = {}
+		world.ui = {}
+		collectgarbage()
+	elseif(event.name == "dead") then
+		world.dead = true
 	elseif(event.name == "changelevel") then
 		world.currentLevel = helpers.clamp(event.id,1,#world.levels)
 		local levelStart = world.levels[world.currentLevel].terrain.map.start
@@ -168,6 +176,9 @@ function world.processWorldEvent(event)
 	elseif(event.name == "createai") then
 		world.ais[event.id] = ai:new(world)
 		world.ais[event.id]:initialize()
+	elseif(event.name == "initui") then
+		world.ui[1] = progressBar:new()
+		world.ui[1]:configure{x = 4, y = 4, width = 100, height = 5}
 	end
 end
 
@@ -260,7 +271,6 @@ Process projectile events in the projectile queue and send to the requested proj
 --param: event - event table containing all the event information
 --return: none
 function world.processAIEvent(event)
-	debugLog:append("AI Process")
 	if(event.destination == "all") then
 		for id = 1, #world.ais do
 			world.ais[id]:processEvent(event)
@@ -293,6 +303,19 @@ function world.processChanges()
 end
 
 --[[
+world.updateUI:
+Process projectile events in the projectile queue and send to the requested projectiles
+]]--
+--param: event - event table containing all the event information
+--return: none
+function world.updateUI()
+	health = world.characters[1].stats.health
+	maxhealth = 100
+	debugLog:append(tostring(health).."/"..tostring(maxhealth))
+	world.ui[1]:update{value = health, maximum = maxhealth}
+end
+
+--[[
 world.configureCamera:
 Center camera position on the characters current location
 ]]--
@@ -315,6 +338,18 @@ function world.draw()
 	end
 	for id = 1, #world.enemies do
 		world.enemies[id]:draw()
+	end
+end
+
+--[[
+world.drawUI:
+Call draw in every UI object outside of world translation coordinates.
+]]--
+--param: none
+--return: none
+function world.drawUI()
+	for id = 1, #world.ui do
+		world.ui[id]:draw()
 	end
 end
 

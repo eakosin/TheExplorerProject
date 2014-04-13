@@ -77,10 +77,16 @@ function love.update(dt)
 	timeStart = love.timer.getTime()
 	--Process input before processing event queue.
 	love.event.pump()
+	if(world.dead) then
+		menu.visible = true
+		world.loading = true
+		world.dead = false
+		world.eventQueue.world[#world.eventQueue.world + 1] = {name = "destroy"}
+	end
 	if(keyState.escape) then
 		menu.visible = true
 		world.loading = true
-		world.eventQueue.world[#world.eventQueue.world + 1] = {name = "destroylevels"}
+		world.eventQueue.world[#world.eventQueue.world + 1] = {name = "destroy"}
 	end
 	if(keyState.n) then
 		if(inputLock:lock("n")) then
@@ -105,6 +111,7 @@ function love.update(dt)
 		world.fillEventQueue()
 		world.processEventQueue()
 		world.processChanges()
+		world.updateUI()
 	end
 	debugLog:commit()
 end
@@ -147,8 +154,11 @@ function love.draw()
 		
 		world.draw()
 		
-		love.graphics.setCanvas(canvas.primary)
 		love.graphics.origin()
+		
+		world.drawUI()
+		
+		love.graphics.setCanvas(canvas.primary)
 		love.graphics.draw(canvas.diffuse,0,0,0,2,2)
 		love.graphics.setCanvas()
 		love.graphics.draw(canvas.primary)
